@@ -33,7 +33,7 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
 
   const handleTestConnection = async () => {
     if (!formData.telegramBotToken?.trim() || !formData.telegramChatId?.trim()) {
-      showNotification('error', 'Please fill in both Bot Token and Chat ID');
+      showNotification('error', 'Missing Credentials', 'Please fill in both Bot Token and Chat ID');
       return;
     }
 
@@ -45,9 +45,9 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
     setTesting(false);
 
     if (success) {
-      showNotification('success', 'Connection successful! Test message sent.');
+      showNotification('success', 'Success!', 'Connection successful! Test message sent.');
     } else {
-      showNotification('error', 'Connection failed. Please check your credentials.');
+      showNotification('error', 'Connection Failed', 'Please check your credentials.');
     }
   };
 
@@ -55,31 +55,31 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
     if (biometricEnabled) {
       await biometric.disable();
       setBiometricEnabled(false);
-      showNotification('success', 'Biometric lock disabled');
+      showNotification('success', 'Security', 'Biometric lock disabled');
     } else {
       const success = await biometric.enable();
       if (success) {
         setBiometricEnabled(true);
-        showNotification('success', 'Biometric lock enabled');
+        showNotification('success', 'Security', 'Biometric lock enabled');
       } else {
-        showNotification('error', 'Failed to enable biometric lock');
+        showNotification('error', 'Security Error', 'Failed to enable biometric lock');
       }
     }
   };
 
   const handleExport = (encrypted: boolean) => {
     storage.exportData(encrypted).then(() => {
-      showNotification('success', encrypted ? 'Encrypted backup downloaded' : 'Backup downloaded');
+      showNotification('success', 'Backup Complete', encrypted ? 'Encrypted backup downloaded' : 'Backup downloaded');
     });
   };
 
   const handleImport = async (file: File, password?: string) => {
     try {
       await storage.importData(file, password);
-      showNotification('success', 'Data imported successfully!');
+      showNotification('success', 'Import Complete', 'Data imported successfully!');
       setTimeout(() => window.location.reload(), 1000);
     } catch (error) {
-      showNotification('error', 'Failed to import data. Check the file and password.');
+      showNotification('error', 'Import Failed', 'Check the file and password.');
     }
   };
 
