@@ -7,7 +7,6 @@ import SettingsModal from './components/SettingsModal';
 import MobileSettingsModal from './components/MobileSettingsModal';
 import CategoryManager from './components/CategoryManager';
 import ConfirmModal from './components/ConfirmModal';
-import BiometricLock from './components/BiometricLock';
 import MasterPasswordLock from './components/MasterPasswordLock';
 import { AISettings } from './components/AISettings';
 import { AIRecommendations } from './components/AIRecommendations';
@@ -18,7 +17,6 @@ import { storage } from './utils/storage';
 import { setupNotificationScheduler } from './utils/notificationScheduler';
 import { useTheme } from './hooks/useTheme';
 import { useIsTouchDevice } from './hooks/useTouch';
-import { biometric } from './utils/biometric';
 import { masterPassword } from './utils/masterPassword';
 import './App.css';
 
@@ -39,7 +37,6 @@ function App() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
   const { theme, toggleTheme } = useTheme();
-  const [isLocked, setIsLocked] = useState(false);
   const [isMasterPasswordLocked, setIsMasterPasswordLocked] = useState(false);
   const [showAIModal, setShowAIModal] = useState<'menu' | 'settings' | 'recommendations' | null>(null);
   const isTouchDevice = useIsTouchDevice();
@@ -48,11 +45,6 @@ function App() {
     // Setup notification scheduler
     setupNotificationScheduler();
     
-    // Check if biometric lock is needed
-    if (biometric.needsAuthentication()) {
-      setIsLocked(true);
-    }
-    
     // Check if master password lock is needed
     if (masterPassword.needsUnlock()) {
       setIsMasterPasswordLocked(true);
@@ -60,9 +52,6 @@ function App() {
     
     // Set up activity tracking
     const updateActivity = () => {
-      if (biometric.isEnabled() && !isLocked) {
-        biometric.updateLastAuth();
-      }
       if (masterPassword.isEnabled() && !isMasterPasswordLocked) {
         masterPassword.updateLastActivity();
       }
@@ -82,9 +71,6 @@ function App() {
     
     // Check for inactivity every minute
     const inactivityCheck = setInterval(() => {
-      if (biometric.needsAuthentication() && !isLocked) {
-        setIsLocked(true);
-      }
       if (masterPassword.needsUnlock() && !isMasterPasswordLocked) {
         setIsMasterPasswordLocked(true);
       }
@@ -97,7 +83,7 @@ function App() {
       });
       clearInterval(inactivityCheck);
     };
-  }, [isLocked, isMasterPasswordLocked]);
+  }, [isMasterPasswordLocked]);
 
   useEffect(() => {
     storage.saveAPIs(apis);
@@ -169,15 +155,10 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {(isLocked || isMasterPasswordLocked) && (
-          isMasterPasswordLocked ? (
-            <MasterPasswordLock onUnlocked={() => {
-              setIsMasterPasswordLocked(false);
-              setIsLocked(false);
-            }} />
-          ) : (
-            <BiometricLock onAuthenticated={() => setIsLocked(false)} />
-          )
+        {isMasterPasswordLocked && (
+          <MasterPasswordLock onUnlocked={() => {
+            setIsMasterPasswordLocked(false);
+          }} />
         )}
         
         <Header 

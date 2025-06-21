@@ -204,6 +204,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
     const success = await masterPassword.disable(password);
     if (success) {
       setMasterPasswordEnabled(false);
+      // Also disable biometric when master password is disabled
+      if (biometricEnabled) {
+        await biometric.disable();
+        setBiometricEnabled(false);
+      }
       showNotification('success', 'Security', 'Master password disabled');
     } else {
       showNotification('error', 'Security Error', 'Incorrect password');
@@ -443,26 +448,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                   
                   <div className="security-section">
                     <div className="security-card">
-                      <h4>Biometric Lock</h4>
-                      <p>Protect SubAlert with fingerprint or face recognition on supported devices.</p>
-                      
-                      {biometricAvailable ? (
-                        <label className="checkbox-label" style={{ marginTop: '1rem' }}>
-                          <input
-                            type="checkbox"
-                            checked={biometricEnabled}
-                            onChange={handleBiometricToggle}
-                          />
-                          Enable biometric authentication
-                        </label>
-                      ) : (
-                        <p style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem', marginTop: '1rem' }}>
-                          Biometric authentication is not available on this device.
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="security-card">
                       <h4>Master Password</h4>
                       <p>Encrypt all your data with a master password for maximum security.</p>
                       
@@ -483,6 +468,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                       
                       {masterPasswordEnabled && (
                         <>
+                          {biometricAvailable && (
+                            <label className="checkbox-label" style={{ marginTop: '1rem' }}>
+                              <input
+                                type="checkbox"
+                                checked={biometricEnabled}
+                                onChange={handleBiometricToggle}
+                              />
+                              Enable biometric unlock
+                            </label>
+                          )}
+                          
                           <div className="form-group" style={{ marginTop: '1rem' }}>
                             <label htmlFor="lockTimeout">Lock timeout</label>
                             <select

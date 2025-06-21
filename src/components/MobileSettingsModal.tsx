@@ -115,6 +115,11 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
     const success = await masterPassword.disable(password);
     if (success) {
       setMasterPasswordEnabled(false);
+      // Also disable biometric when master password is disabled
+      if (biometricEnabled) {
+        await biometric.disable();
+        setBiometricEnabled(false);
+      }
       showNotification('success', 'Security', 'Master password disabled');
     } else {
       showNotification('error', 'Security Error', 'Incorrect password');
@@ -314,33 +319,6 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
       
       <h3>Security</h3>
       
-      {biometricAvailable ? (
-        <div className="form-group">
-          <div className="toggle-container">
-            <div className="toggle-content">
-              <h4>Biometric Lock</h4>
-              <p className="toggle-description">
-                Use fingerprint or Face ID to unlock the app
-              </p>
-            </div>
-            <label htmlFor="biometricLock" className="toggle-switch">
-              <input
-                type="checkbox"
-                id="biometricLock"
-                checked={biometricEnabled}
-                onChange={handleBiometricToggle}
-                className="toggle-input"
-              />
-              <span className="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-      ) : (
-        <div className="info-message">
-          <p>Biometric authentication is not available on this device.</p>
-        </div>
-      )}
-      
       <div className="form-group">
         <div className="toggle-container">
           <div className="toggle-content">
@@ -367,6 +345,29 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
           </label>
         </div>
       </div>
+      
+      {masterPasswordEnabled && biometricAvailable && (
+        <div className="form-group">
+          <div className="toggle-container">
+            <div className="toggle-content">
+              <h4>Biometric Unlock</h4>
+              <p className="toggle-description">
+                Use fingerprint or Face ID to unlock
+              </p>
+            </div>
+            <label htmlFor="biometricLock" className="toggle-switch">
+              <input
+                type="checkbox"
+                id="biometricLock"
+                checked={biometricEnabled}
+                onChange={handleBiometricToggle}
+                className="toggle-input"
+              />
+              <span className="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      )}
       
       {masterPasswordEnabled && (
         <div className="form-group">
