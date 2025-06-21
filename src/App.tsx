@@ -45,11 +45,13 @@ function App() {
     // Setup notification scheduler
     setupNotificationScheduler();
     
-    // Check if master password lock is needed
+    // Check if master password lock is needed only on initial mount
     if (masterPassword.needsUnlock()) {
       setIsMasterPasswordLocked(true);
     }
-    
+  }, []); // Empty dependency array - only run once on mount
+
+  useEffect(() => {
     // Set up activity tracking
     const updateActivity = () => {
       if (masterPassword.isEnabled() && !isMasterPasswordLocked) {
@@ -158,6 +160,10 @@ function App() {
         {isMasterPasswordLocked && (
           <MasterPasswordLock onUnlocked={() => {
             setIsMasterPasswordLocked(false);
+            // Reload data after unlock
+            setApis(storage.getAPIs());
+            setCategories(storage.getCategories());
+            setSettings(storage.getSettings());
           }} />
         )}
         

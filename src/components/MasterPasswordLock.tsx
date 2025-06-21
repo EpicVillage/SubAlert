@@ -38,7 +38,15 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
       if (success) {
         biometric.updateLastAuth();
         masterPassword.updateLastActivity();
-        onUnlocked();
+        
+        // When using biometric, we just unlock without decrypting
+        // The data should already be decrypted in localStorage
+        masterPassword.updateLastUnlock();
+        
+        // Small delay to ensure localStorage is updated
+        setTimeout(() => {
+          onUnlocked();
+        }, 100);
       } else {
         showNotification('error', 'Authentication Failed', 'Please try again or use your password.');
       }
@@ -63,7 +71,10 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
     const success = await masterPassword.unlock(password);
     
     if (success) {
-      onUnlocked();
+      // Small delay to ensure localStorage is updated
+      setTimeout(() => {
+        onUnlocked();
+      }, 100);
     } else {
       setError('Incorrect password');
       setIsUnlocking(false);
