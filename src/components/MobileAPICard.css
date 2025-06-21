@@ -1,0 +1,104 @@
+.mobile-api-card-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.mobile-api-card-content {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+  will-change: transform;
+  cursor: grab;
+}
+
+.mobile-api-card-content:active {
+  cursor: grabbing;
+}
+
+.swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: stretch;
+  z-index: 1;
+}
+
+.swipe-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  gap: 0.5rem;
+}
+
+.swipe-action:active {
+  opacity: 0.8;
+}
+
+.swipe-action.edit {
+  background: var(--primary-color);
+}
+
+.swipe-action.delete {
+  background: #ef4444;
+}
+
+.swipe-action svg {
+  stroke: white;
+}
+
+/* Delete animation */
+.mobile-api-card-wrapper.deleting {
+  animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideOut {
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+/* Haptic feedback visual indicator */
+.mobile-api-card-content.haptic-feedback {
+  animation: haptic 0.1s ease;
+}
+
+@keyframes haptic {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+}
+
+/* Touch optimizations */
+@media (max-width: 768px) {
+  .mobile-api-card-wrapper {
+    touch-action: pan-y;
+  }
+  
+  .mobile-api-card-content {
+    /* Prevent text selection during swipe */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Increase touch targets */
+  .swipe-action {
+    min-width: 80px;
+  }
+}

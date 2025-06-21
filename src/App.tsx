@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
@@ -10,10 +10,12 @@ import BiometricLock from './components/BiometricLock';
 import { AISettings } from './components/AISettings';
 import { AIRecommendations } from './components/AIRecommendations';
 import { AIMenu } from './components/AIMenu';
+import PullToRefresh from './components/PullToRefresh';
 import { API, Settings, Category } from './types';
 import { storage } from './utils/storage';
 import { setupNotificationScheduler } from './utils/notificationScheduler';
 import { useTheme } from './hooks/useTheme';
+import { useIsTouchDevice } from './hooks/useTouch';
 import { biometric } from './utils/biometric';
 import './App.css';
 
@@ -36,6 +38,7 @@ function App() {
   const { theme, toggleTheme } = useTheme();
   const [isLocked, setIsLocked] = useState(false);
   const [showAIModal, setShowAIModal] = useState<'menu' | 'settings' | 'recommendations' | null>(null);
+  const isTouchDevice = useIsTouchDevice();
 
   useEffect(() => {
     // Setup notification scheduler
@@ -134,6 +137,20 @@ function App() {
     setShowCategoryManager(false);
   };
 
+  const handleRefresh = useCallback(async () => {
+    // Simulate refresh - in a real app, this might fetch from a server
+    const refreshedApis = storage.getAPIs();
+    const refreshedCategories = storage.getCategories();
+    const refreshedSettings = storage.getSettings();
+    
+    setApis(refreshedApis);
+    setCategories(refreshedCategories);
+    setSettings(refreshedSettings);
+    
+    // Small delay to show refresh animation
+    await new Promise(resolve => setTimeout(resolve, 800));
+  }, []);
+
   return (
     <Router>
       <div className="App">
@@ -153,14 +170,29 @@ function App() {
         />
         <Routes>
           <Route path="/" element={
-            <Dashboard 
-              apis={apis}
-              categories={categories}
-              onEditAPI={handleEditAPI}
-              onDeleteAPI={handleDeleteAPI}
-              onUpdateAPI={handleUpdateAPI}
-              isEditMode={isEditMode}
-            />
+            isTouchDevice ? (
+              <PullToRefresh onRefresh={handleRefresh}>
+                <Dashboard 
+                  apis={apis}
+                  categories={categories}
+                  onEditAPI={handleEditAPI}
+                  onDeleteAPI={handleDeleteAPI}
+                  onUpdateAPI={handleUpdateAPI}
+                  isEditMode={isEditMode}
+                  isMobile={true}
+                />
+              </PullToRefresh>
+            ) : (
+              <Dashboard 
+                apis={apis}
+                categories={categories}
+                onEditAPI={handleEditAPI}
+                onDeleteAPI={handleDeleteAPI}
+                onUpdateAPI={handleUpdateAPI}
+                isEditMode={isEditMode}
+                isMobile={false}
+              />
+            )
           } />
         </Routes>
         

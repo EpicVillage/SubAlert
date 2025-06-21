@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { API, Category } from '../types';
 import APICard from './APICard';
+import MobileAPICard from './MobileAPICard';
 import CategoryView from './CategoryView';
 import Stats from './Stats';
 import { differenceInDays, parseISO } from 'date-fns';
+import BottomSheet from './BottomSheet';
 
 interface DashboardProps {
   apis: API[];
@@ -12,13 +14,15 @@ interface DashboardProps {
   onDeleteAPI: (id: string) => void;
   onUpdateAPI?: (api: API) => void;
   isEditMode?: boolean;
+  isMobile?: boolean;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false }) => {
+const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false, isMobile = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'expiring' | 'paid' | 'free'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'category'>('grid');
   const [filteredAPIs, setFilteredAPIs] = useState<API[]>(apis);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
   useEffect(() => {
     let filtered = apis;
@@ -112,29 +116,52 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <select
-          className="filter-select"
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value as any)}
-        >
-          <option value="all">All APIs</option>
-          <option value="expiring">Expiring Soon</option>
-          <option value="paid">Paid</option>
-          <option value="free">Free</option>
-        </select>
+        {isMobile ? (
+          <button
+            className="filter-select mobile-filter-btn"
+            onClick={() => setShowFilterMenu(true)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            {filterType === 'all' ? 'Filter' : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
+          </button>
+        ) : (
+          <select
+            className="filter-select"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as any)}
+          >
+            <option value="all">All APIs</option>
+            <option value="expiring">Expiring Soon</option>
+            <option value="paid">Paid</option>
+            <option value="free">Free</option>
+          </select>
+        )}
       </div>
 
       {viewMode === 'grid' ? (
         <div className="api-grid">
           {filteredAPIs.map(api => (
-            <APICard
-              key={api.id}
-              api={api}
-              categories={categories}
-              onEdit={() => onEditAPI(api)}
-              onDelete={() => onDeleteAPI(api.id)}
-              isEditMode={isEditMode}
-            />
+            isMobile ? (
+              <MobileAPICard
+                key={api.id}
+                api={api}
+                categories={categories}
+                onEdit={() => onEditAPI(api)}
+                onDelete={() => onDeleteAPI(api.id)}
+                isEditMode={isEditMode}
+              />
+            ) : (
+              <APICard
+                key={api.id}
+                api={api}
+                categories={categories}
+                onEdit={() => onEditAPI(api)}
+                onDelete={() => onDeleteAPI(api.id)}
+                isEditMode={isEditMode}
+              />
+            )
           ))}
           {filteredAPIs.length === 0 && (
             <div className="empty-state">
@@ -155,6 +182,66 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
           onUpdateAPI={onUpdateAPI || ((updatedAPI) => onEditAPI(updatedAPI))}
           isEditMode={isEditMode}
         />
+      )}
+      
+      {isMobile && (
+        <BottomSheet
+          isOpen={showFilterMenu}
+          onClose={() => setShowFilterMenu(false)}
+          title="Filter Subscriptions"
+        >
+          <div className="bottom-sheet-menu">
+            <button
+              className="bottom-sheet-menu-item"
+              onClick={() => {
+                setFilterType('all');
+                setShowFilterMenu(false);
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+              All Subscriptions
+            </button>
+            <button
+              className="bottom-sheet-menu-item"
+              onClick={() => {
+                setFilterType('expiring');
+                setShowFilterMenu(false);
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              Expiring Soon
+            </button>
+            <button
+              className="bottom-sheet-menu-item"
+              onClick={() => {
+                setFilterType('paid');
+                setShowFilterMenu(false);
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Paid Subscriptions
+            </button>
+            <button
+              className="bottom-sheet-menu-item"
+              onClick={() => {
+                setFilterType('free');
+                setShowFilterMenu(false);
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69365 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 2.99817C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69365 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.99871 7.05 2.99871C5.59096 2.99871 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54871 7.04097 1.54871 8.5C1.54871 9.95903 2.1283 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93789 22.4518 9.22248 22.4518 8.5C22.4518 7.77751 22.3095 7.0621 22.0329 6.39464C21.7563 5.72718 21.351 5.12075 20.84 4.61V4.61Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Free Subscriptions
+            </button>
+          </div>
+        </BottomSheet>
       )}
     </div>
   );

@@ -4,32 +4,49 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 
 ![SubAlert Preview](https://img.shields.io/badge/PWA-Ready-5A9FD4?style=flat-square&logo=pwa)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9+-3178C6?style=flat-square&logo=typescript)
-![React](https://img.shields.io/badge/React-18.2+-61DAFB?style=flat-square&logo=react)
+![React](https://img.shields.io/badge/React-19.1+-61DAFB?style=flat-square&logo=react)
 
 ## ✨ Features
 
 ### Core Features
-- 📊 **Dashboard View** - See all your subscriptions at a glance
+- 📊 **Dashboard View** - See all your subscriptions at a glance with stats
 - 🔍 **Search & Filter** - Find subscriptions quickly by name or category
 - 📁 **Custom Categories** - Organize with drag-and-drop categories
 - 🎨 **Dark Mode** - Easy on the eyes with automatic theme detection
 - 🤖 **AI Recommendations** - Get smart cost-saving insights with your own API key
+- 🔄 **Auto-Renewal Tracking** - Smart handling of recurring subscriptions
+
+### AI-Powered Analysis
+- 🎯 **Feature Comparison Matrix** - Compare your services with alternatives side-by-side
+- 💡 **Smart Recommendations** - Get specific alternative service suggestions
+- 💰 **Cost Analysis** - See potential savings with detailed breakdowns
+- 📊 **Visual Comparisons** - Feature-by-feature comparison tables
+- ✨ **Multiple AI Providers** - Support for OpenAI and Anthropic Claude
 
 ### Security & Privacy
 - 🔐 **Password Protected Exports** - Encrypt your backups with AES-256-GCM
 - 🔏 **Biometric Lock** - Fingerprint/Face ID protection on supported devices
 - 💾 **Local Storage** - All data stays on your device
 - 🔒 **Secure API Storage** - API keys are stored safely
+- 🛡️ **Zero External Dependencies** - No tracking or analytics
 
 ### Notifications & Alerts
 - 💬 **Telegram Integration** - Get notified before subscriptions expire
 - ⏰ **Smart Reminders** - Customizable notification timing
 - 📅 **Expiry Tracking** - Visual indicators for expiring subscriptions
+- 🔄 **Auto-Renewal Awareness** - Different handling for auto-renewing vs expiring subscriptions
 
 ### Data Management
 - 📤 **Export/Import** - Backup your data with optional encryption
 - 🔄 **Drag & Drop** - Reorganize subscriptions between categories
 - ✏️ **Bulk Edit Mode** - Manage multiple items efficiently
+- 📝 **Rich Service Details** - Add descriptions and websites for better tracking
+
+### Visual Design
+- 🎨 **Glassmorphic UI** - Modern, translucent design elements
+- 🖼️ **Custom Branding** - Beautiful SubAlert logo with Arinza font
+- 🌓 **Theme-Aware Logo** - Different logos for light/dark modes
+- 📱 **Responsive Design** - Works perfectly on all devices
 
 ## 🚀 Installation
 
@@ -60,10 +77,9 @@ npm start
 npm run build
 ```
 
-5. Serve the production build:
+5. Deploy to Vercel (recommended):
 ```bash
-npm install -g serve
-serve -s build
+vercel
 ```
 
 ## 📱 PWA Installation
@@ -102,8 +118,8 @@ serve -s build
 SubAlert supports AI-powered subscription analysis using your own API keys. No data is sent to our servers - everything runs locally in your browser.
 
 ### Supported Providers:
-- **OpenAI** (GPT-3.5/GPT-4)
-- **Anthropic** (Claude)
+- **OpenAI** (GPT-3.5-Turbo)
+- **Anthropic** (Claude 3 Haiku)
 
 ### Setup:
 1. Click the 🤖 AI button in the header
@@ -112,14 +128,14 @@ SubAlert supports AI-powered subscription analysis using your own API keys. No d
 4. Start getting recommendations!
 
 ### Features:
-- Cost-saving analysis
-- Redundancy detection
-- Alternative suggestions
-- Bundle recommendations
-- Usage optimization
+- **Feature Comparison Matrix** - See detailed feature comparisons
+- **Cost-Saving Analysis** - Identify potential savings
+- **Alternative Suggestions** - Get specific service recommendations
+- **Visual Comparisons** - Side-by-side feature tables
+- **Pros & Cons Analysis** - Understand tradeoffs
 
 ### Important Note:
-AI features require deployment to Vercel or another platform due to CORS restrictions. Direct API calls from localhost will fail. The app automatically uses the included proxy endpoint when deployed.
+AI features require deployment to Vercel or another platform due to CORS restrictions. The app automatically uses the included proxy endpoint when deployed.
 
 ## 📖 Usage
 
@@ -127,27 +143,42 @@ AI features require deployment to Vercel or another platform due to CORS restric
 1. Click "+ Add" button
 2. Fill in the required details:
    - **Service Name** (required)
+   - **Service Description** - What does this service do?
+   - **Website** - Service URL for reference
    - **Category** - Choose from existing or create custom
    - **Subscription Type** - Free or Paid
-   - **Associated Email** (optional)
-   - **API Key** (optional) - Click + to reveal field
+   - **Associated Email** (required)
+   - **API Key** (optional) - Click "+ Add API Key" to reveal field
    - For paid subscriptions:
      - **Cost** (required)
      - **Billing Cycle** - Monthly, Yearly, or One-time
-     - **Expiry Date** (required for recurring)
+     - **Auto-renews** - Toggle for recurring subscriptions
+     - **Next Billing/Expiry Date** (required for recurring)
 3. Click "Add API" to save
 
 ### Managing Subscriptions
 - **Edit Mode**: Toggle edit mode to show/hide action buttons
-- **View/Hide API Keys**: Click the eye icon (👁️)
-- **Edit Details**: Click "Edit" button in edit mode
-- **Delete**: Click "Delete" with glassmorphic confirmation
+- **View/Hide API Keys**: Click the eye icon (👁️) - only shows if API key exists
+- **Copy API Key**: One-click copy with visual feedback
+- **Compare Alternatives**: Available for paid subscriptions
+- **Auto-Renewal Tracking**: See "Next Billing" instead of "Expires" for auto-renewing subscriptions
 - **Search**: Real-time search by service name
 - **Filter**: Quick filters for All, Expiring Soon, Paid, Free
 - **Drag & Drop**: Reorganize between categories
 
+### Feature Comparison
+1. Click "Compare Alternatives" on any paid subscription
+2. AI analyzes your service and suggests 2 alternatives
+3. View detailed comparison:
+   - Current service features
+   - Alternative services with costs
+   - Feature-by-feature comparison table
+   - Pros and cons for each alternative
+   - Savings percentage
+   - Personalized recommendations
+
 ### Category Management
-1. Click "Manage Categories" button
+1. Click "🏷️ Categories" button
 2. Options:
    - **Add Custom Category**: Create with name, color, and emoji
    - **Edit Categories**: Modify any category (including defaults)
@@ -158,6 +189,7 @@ AI features require deployment to Vercel or another platform due to CORS restric
 - **Export Options**:
   - Standard JSON export
   - Password-protected encrypted export (AES-256-GCM)
+  - Includes all settings, categories, and AI configuration
 - **Import**: Upload and restore from backup files
 - **Auto-validation**: Ensures data integrity on import
 
@@ -178,18 +210,19 @@ AI features require deployment to Vercel or another platform due to CORS restric
 ### Data Privacy
 - **100% Local Storage** - All data stays on your device
 - **No Analytics** - Zero tracking or telemetry
-- **No External APIs** - Except optional Telegram
+- **No External APIs** - Except optional Telegram and AI providers
 - **Secure Storage** - Uses browser's secure localStorage
 
 ## 🏗️ Architecture
 
 ### Tech Stack
-- **Frontend**: React 18 with TypeScript
-- **Styling**: CSS3 with CSS Variables
+- **Frontend**: React 19 with TypeScript
+- **Styling**: CSS3 with CSS Variables & Custom Fonts
 - **State**: React Hooks & Context API
 - **Storage**: localStorage with encryption support
 - **PWA**: Service Worker with offline support
 - **Build**: Create React App with custom configuration
+- **AI Integration**: OpenAI & Anthropic APIs with Vercel Edge Functions
 
 ### Key Features Implementation
 - **Drag & Drop**: HTML5 Drag and Drop API
@@ -197,47 +230,49 @@ AI features require deployment to Vercel or another platform due to CORS restric
 - **Biometrics**: WebAuthn API
 - **Notifications**: Telegram Bot API
 - **Date Handling**: date-fns library
+- **AI Proxy**: Vercel Edge Functions for CORS handling
 
-## 👨‍💻 Development
+## 🐛 Troubleshooting
 
-### Project Structure
-```
-subalert/
-├── public/
-│   ├── manifest.json    # PWA manifest
-│   └── icons/          # App icons
-├── src/
-│   ├── components/     # React components
-│   ├── hooks/         # Custom React hooks
-│   ├── types/         # TypeScript definitions
-│   ├── utils/         # Utility functions
-│   └── App.tsx        # Main component
-└── package.json       # Dependencies
-```
+### Service Worker Issues
+If you experience reload loops on localhost:
+1. Visit `http://localhost:3000/clear-sw.html`
+2. Or in Chrome DevTools: Application → Storage → Clear site data
 
-### Available Scripts
-- `npm start` - Development server
-- `npm test` - Run tests
-- `npm run build` - Production build
-- `npm run eject` - Eject from CRA
-
-### Contributing
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+### AI Features Not Working
+- Ensure you're using the deployed version (not localhost)
+- Check your API key is correct
+- Verify you have credits with your AI provider
 
 ## 🔮 Future Features
 
 - [ ] Multi-device sync via encrypted cloud backup
 - [ ] Browser extension for quick access
 - [ ] Email notifications support
-- [ ] Subscription cost analytics
-- [ ] Smart renewal recommendations
+- [ ] Subscription cost analytics dashboard
+- [ ] Budget alerts and spending trends
 - [ ] Team sharing with encryption
-- [ ] API usage tracking
+- [ ] API usage tracking and limits
 - [ ] Integration with payment providers
+- [ ] Subscription recommendation engine
+- [ ] Calendar integration for renewal dates
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+1. Install Vercel CLI: `npm i -g vercel`
+2. Run: `vercel`
+3. Follow the prompts
+4. Your app will be live with AI features enabled!
+
+### Other Platforms
+The app can be deployed to any static hosting service:
+- Netlify
+- GitHub Pages
+- Cloudflare Pages
+- AWS S3 + CloudFront
+
+Note: AI features require serverless function support.
 
 ## 📄 License
 
@@ -245,9 +280,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
+- Logo designed with care for the SubAlert brand
+- Arinza font for beautiful typography
 - Icons from [Lucide](https://lucide.dev/)
 - Date handling by [date-fns](https://date-fns.org/)
-- Inspired by the need to track too many subscriptions
+- Glassmorphic design inspiration
+- Built with love for subscription management
 
 ---
 
