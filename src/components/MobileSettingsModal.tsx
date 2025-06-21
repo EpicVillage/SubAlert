@@ -409,40 +409,48 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
       </BottomSheet>
       
       {showPasswordModal && (
-        <PasswordModal
-          title="Encrypt Backup"
-          description="Enter a password to encrypt your backup file"
-          onConfirm={handlePasswordExport}
-          onCancel={() => setShowPasswordModal(false)}
-        />
+        <div style={{ position: 'fixed', zIndex: 10000 }}>
+          <PasswordModal
+            title="Encrypt Backup"
+            description="Enter a password to encrypt your backup file"
+            onConfirm={handlePasswordExport}
+            onCancel={() => setShowPasswordModal(false)}
+          />
+        </div>
       )}
       
       {showMasterPasswordModal === 'setup' && (
-        <PasswordModal
-          title="Setup Master Password"
-          description="Create a master password to encrypt all your data"
-          confirmButtonText="Setup"
-          showConfirmPassword={true}
-          onConfirm={handleMasterPasswordSetup}
-          onCancel={() => setShowMasterPasswordModal(null)}
-        />
+        <div style={{ position: 'fixed', zIndex: 10000 }}>
+          <PasswordModal
+            title="Setup Master Password"
+            description="Create a master password to encrypt all your data"
+            confirmButtonText="Setup"
+            showConfirmPassword={true}
+            onConfirm={handleMasterPasswordSetup}
+            onCancel={() => setShowMasterPasswordModal(null)}
+          />
+        </div>
       )}
       
       {showMasterPasswordModal === 'disable' && (
-        <PasswordModal
-          title="Disable Master Password"
-          description="Enter your current master password to disable encryption"
-          confirmButtonText="Disable"
-          onConfirm={handleMasterPasswordDisable}
-          onCancel={() => setShowMasterPasswordModal(null)}
-        />
+        <div style={{ position: 'fixed', zIndex: 10000 }}>
+          <PasswordModal
+            title="Disable Master Password"
+            description="Enter your current master password to disable encryption"
+            confirmButtonText="Disable"
+            onConfirm={handleMasterPasswordDisable}
+            onCancel={() => setShowMasterPasswordModal(null)}
+          />
+        </div>
       )}
       
       {showMasterPasswordModal === 'change' && (
-        <ChangePasswordModal
-          onConfirm={handleMasterPasswordChange}
-          onCancel={() => setShowMasterPasswordModal(null)}
-        />
+        <div style={{ position: 'fixed', zIndex: 10000 }}>
+          <ChangePasswordModal
+            onConfirm={handleMasterPasswordChange}
+            onCancel={() => setShowMasterPasswordModal(null)}
+          />
+        </div>
       )}
     </>
   );

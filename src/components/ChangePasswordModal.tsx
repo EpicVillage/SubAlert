@@ -39,8 +39,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onConfirm, on
   };
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal password-modal">
+    <div className="modal-overlay" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>Change Master Password</h2>
         
         <form onSubmit={handleSubmit}>
