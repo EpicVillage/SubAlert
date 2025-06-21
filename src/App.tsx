@@ -7,6 +7,9 @@ import SettingsModal from './components/SettingsModal';
 import CategoryManager from './components/CategoryManager';
 import ConfirmModal from './components/ConfirmModal';
 import BiometricLock from './components/BiometricLock';
+import { AISettings } from './components/AISettings';
+import { AIRecommendations } from './components/AIRecommendations';
+import { AIMenu } from './components/AIMenu';
 import { API, Settings, Category } from './types';
 import { storage } from './utils/storage';
 import { setupNotificationScheduler } from './utils/notificationScheduler';
@@ -32,6 +35,7 @@ function App() {
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
   const { theme, toggleTheme } = useTheme();
   const [isLocked, setIsLocked] = useState(false);
+  const [showAIModal, setShowAIModal] = useState<'menu' | 'settings' | 'recommendations' | null>(null);
 
   useEffect(() => {
     // Setup notification scheduler
@@ -49,6 +53,12 @@ function App() {
       }
     };
     
+    // Listen for AI settings event from Settings modal
+    const handleOpenAISettings = () => {
+      setShowAIModal('settings');
+    };
+    window.addEventListener('openAISettings', handleOpenAISettings);
+    
     // Track user activity
     const events = ['click', 'keydown', 'touchstart'];
     events.forEach(event => {
@@ -63,6 +73,7 @@ function App() {
     }, 60000);
     
     return () => {
+      window.removeEventListener('openAISettings', handleOpenAISettings);
       events.forEach(event => {
         document.removeEventListener(event, updateActivity);
       });
@@ -138,6 +149,7 @@ function App() {
           isEditMode={isEditMode}
           onToggleEditMode={() => setIsEditMode(!isEditMode)}
           onOpenCategories={() => setShowCategoryManager(true)}
+          onOpenAI={() => setShowAIModal('menu')}
         />
         <Routes>
           <Route path="/" element={
@@ -186,6 +198,31 @@ function App() {
             type="danger"
             onConfirm={confirmDelete}
             onCancel={() => setDeleteConfirm({ show: false, id: null })}
+          />
+        )}
+        
+        {showAIModal === 'menu' && (
+          <AIMenu
+            onOpenSettings={() => {
+              setShowAIModal('settings');
+            }}
+            onOpenRecommendations={() => {
+              setShowAIModal('recommendations');
+            }}
+            onClose={() => setShowAIModal(null)}
+          />
+        )}
+        
+        {showAIModal === 'settings' && (
+          <AISettings
+            onClose={() => setShowAIModal(null)}
+          />
+        )}
+        
+        {showAIModal === 'recommendations' && (
+          <AIRecommendations
+            apis={apis}
+            onClose={() => setShowAIModal(null)}
           />
         )}
       </div>

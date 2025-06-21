@@ -13,6 +13,7 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 - 🔍 **Search & Filter** - Find subscriptions quickly by name or category
 - 📁 **Custom Categories** - Organize with drag-and-drop categories
 - 🎨 **Dark Mode** - Easy on the eyes with automatic theme detection
+- 🤖 **AI Recommendations** - Get smart cost-saving insights with your own API key
 
 ### Security & Privacy
 - 🔐 **Password Protected Exports** - Encrypt your backups with AES-256-GCM
@@ -95,6 +96,30 @@ serve -s build
    - Enter your bot token and chat ID
    - Test the connection
    - Enable notifications
+
+## 🤖 AI Integration
+
+SubAlert supports AI-powered subscription analysis using your own API keys. No data is sent to our servers - everything runs locally in your browser.
+
+### Supported Providers:
+- **OpenAI** (GPT-3.5/GPT-4)
+- **Anthropic** (Claude)
+
+### Setup:
+1. Click the 🤖 AI button in the header
+2. Choose your provider
+3. Enter your API key
+4. Start getting recommendations!
+
+### Features:
+- Cost-saving analysis
+- Redundancy detection
+- Alternative suggestions
+- Bundle recommendations
+- Usage optimization
+
+### Important Note:
+AI features require deployment to Vercel or another platform due to CORS restrictions. Direct API calls from localhost will fail. The app automatically uses the included proxy endpoint when deployed.
 
 ## 📖 Usage
 

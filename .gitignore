@@ -62,6 +62,7 @@ Thumbs.db
 # Environment variables
 .env
 .env.*
+!.env.example
 
 # Package files
 *.tgz

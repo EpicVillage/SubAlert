@@ -12,7 +12,7 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-type SettingsSection = 'telegram' | 'backup' | 'security';
+type SettingsSection = 'telegram' | 'backup' | 'security' | 'ai';
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose }) => {
   const { showNotification } = useNotification();
@@ -213,6 +213,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
               <span className="settings-nav-icon">🔐</span>
               Security
             </button>
+            <button
+              className={`settings-nav-item ${activeSection === 'ai' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveSection('ai');
+                setValidationErrors({});
+              }}
+            >
+              <span className="settings-nav-icon">🤖</span>
+              AI
+            </button>
           </div>
 
           <div className="settings-panel">
@@ -398,6 +408,51 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                         <li>Works on mobile devices and supported browsers</li>
                       </ul>
                     </div>
+                  </div>
+
+                  <div className="modal-actions">
+                    <button type="button" className="btn btn-secondary" onClick={onClose}>
+                      Close
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {activeSection === 'ai' && (
+                <>
+                  <h3>AI Configuration</h3>
+                  
+                  <div className="ai-info">
+                    <p>Configure AI to get smart subscription recommendations and cost-saving insights.</p>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                      Your API key is stored locally and never sent to our servers.
+                    </p>
+                  </div>
+                  
+                  <div className="ai-setup-button">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        onClose();
+                        // Trigger AI settings from App component
+                        const event = new CustomEvent('openAISettings');
+                        window.dispatchEvent(event);
+                      }}
+                    >
+                      🔧 Configure AI Provider
+                    </button>
+                  </div>
+                  
+                  <div className="ai-features">
+                    <h4>What AI can do:</h4>
+                    <ul>
+                      <li>Analyze your subscriptions for cost savings</li>
+                      <li>Identify redundant or similar services</li>
+                      <li>Suggest better alternatives</li>
+                      <li>Recommend bundling opportunities</li>
+                      <li>Find forgotten subscriptions</li>
+                    </ul>
                   </div>
 
                   <div className="modal-actions">

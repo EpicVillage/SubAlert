@@ -8,9 +8,10 @@ interface HeaderProps {
   isEditMode: boolean;
   onToggleEditMode: () => void;
   onOpenCategories: () => void;
+  onOpenAI: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories }) => {
+const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories, onOpenAI }) => {
   return (
     <header className="header">
       <div className="header-content">
@@ -27,6 +28,9 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
           </button>
           <button className="btn btn-secondary" onClick={onOpenCategories}>
             🏷️ Categories
+          </button>
+          <button className="btn btn-secondary" onClick={onOpenAI}>
+            🤖 AI
           </button>
           <button className="theme-toggle" onClick={onToggleTheme}>
             {theme === 'light' ? '🌙' : '☀️'}
