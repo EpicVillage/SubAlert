@@ -183,4 +183,8 @@ export const masterPassword = {
     // Setup with new password
     return await masterPassword.setup(newPassword);
   },
+  
+  updateLastActivity: () => {
+    localStorage.setItem(MASTER_PASSWORD_LAST_UNLOCK, Date.now().toString());
+  },
 };
