@@ -334,6 +334,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                     <div className="backup-card">
                       <h4>Export Data</h4>
                       <p>Download a backup of all your APIs, settings, and categories.</p>
+                      <div className="export-info">
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                          <strong>Your export includes:</strong>
+                        </p>
+                        <ul style={{ fontSize: '0.85rem', margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
+                          <li>All subscriptions & API keys</li>
+                          <li>Custom categories</li>
+                          <li>Telegram bot settings</li>
+                          <li>AI provider & API key</li>
+                        </ul>
+                      </div>
                       <button
                         type="button"
                         className="btn btn-primary"

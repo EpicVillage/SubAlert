@@ -50,10 +50,15 @@ export const storage = {
   },
 
   exportData: (password?: string) => {
+    // Get AI settings directly from localStorage to avoid circular import
+    const aiSettingsRaw = localStorage.getItem('subalert_ai_settings');
+    const aiSettings = aiSettingsRaw ? JSON.parse(aiSettingsRaw) : null;
+    
     const data = {
       apis: storage.getAPIs(),
       settings: storage.getSettings(),
       categories: storage.getCategories(),
+      aiSettings: aiSettings,
       exportDate: new Date().toISOString()
     };
     
@@ -126,6 +131,11 @@ export const storage = {
       // Import categories (use defaults if not present for backward compatibility)
       if (data.categories && Array.isArray(data.categories)) {
         storage.saveCategories(data.categories);
+      }
+      
+      // Import AI settings if present
+      if (data.aiSettings) {
+        localStorage.setItem('subalert_ai_settings', JSON.stringify(data.aiSettings));
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
