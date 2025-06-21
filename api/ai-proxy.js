@@ -8,7 +8,7 @@ export default async function handler(request) {
   }
 
   try {
-    const { provider, apiKey, messages, model } = await request.json();
+    const { provider, apiKey, messages, model, max_tokens } = await request.json();
 
     let apiUrl;
     let headers;
@@ -24,7 +24,7 @@ export default async function handler(request) {
         model: model || 'gpt-3.5-turbo',
         messages,
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: max_tokens || 500,
       });
     } else if (provider === 'anthropic') {
       apiUrl = 'https://api.anthropic.com/v1/messages';
@@ -36,7 +36,7 @@ export default async function handler(request) {
       body = JSON.stringify({
         model: model || 'claude-3-haiku-20240307',
         messages,
-        max_tokens: 500,
+        max_tokens: max_tokens || 500,
       });
     } else {
       return new Response('Invalid provider', { status: 400 });

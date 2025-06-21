@@ -119,7 +119,7 @@ Be specific with service names and avoid generic advice.`
     const messages = [
       {
         role: 'system',
-        content: `You are a feature comparison expert. Analyze the given service and provide detailed comparisons with 2-3 alternatives. 
+        content: `You are a feature comparison expert. Analyze the given service and provide comparisons with exactly 2 alternatives. 
 
 CRITICAL: Return ONLY the JSON object below, nothing else. No explanations, no markdown, no code blocks, just raw JSON.
 
@@ -160,7 +160,7 @@ Rules:
 - importance must be exactly "high", "medium", or "low"
 - If free, use cost: 0 and billingCycle: "monthly"
 - savings should be a percentage number (0-100)
-- Include 5-8 features per alternative
+- Include 3-5 features per alternative
 - Ensure JSON is properly formatted with correct commas and brackets`
       },
       {
@@ -187,8 +187,8 @@ Remember: Return ONLY the JSON object, no other text.`
       },
       body: JSON.stringify(
         isProxy 
-          ? { provider: 'openai', apiKey, messages, model: 'gpt-3.5-turbo' }
-          : { model: 'gpt-3.5-turbo', messages, temperature: 0.3, max_tokens: 1500 }
+          ? { provider: 'openai', apiKey, messages, model: 'gpt-3.5-turbo', max_tokens: 2000 }
+          : { model: 'gpt-3.5-turbo', messages, temperature: 0.3, max_tokens: 2000 }
       ),
     });
 
@@ -219,7 +219,24 @@ Remember: Return ONLY the JSON object, no other text.`
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
-          const parsed = JSON.parse(jsonMatch[0]);
+          let extractedJson = jsonMatch[0];
+          
+          // Check if JSON seems truncated (doesn't end with })
+          if (!extractedJson.trim().endsWith('}')) {
+            // Try to fix truncated JSON by closing open structures
+            const openBraces = (extractedJson.match(/\{/g) || []).length;
+            const closeBraces = (extractedJson.match(/\}/g) || []).length;
+            const openBrackets = (extractedJson.match(/\[/g) || []).length;
+            const closeBrackets = (extractedJson.match(/\]/g) || []).length;
+            
+            // Add missing brackets/braces
+            extractedJson += ']'.repeat(Math.max(0, openBrackets - closeBrackets));
+            extractedJson += '}'.repeat(Math.max(0, openBraces - closeBraces));
+            
+            console.warn('JSON appears truncated, attempted to fix');
+          }
+          
+          const parsed = JSON.parse(extractedJson);
           return validateComparisonResponse(parsed);
         } catch (e2) {
           console.error('Failed to parse extracted JSON:', jsonMatch[0]);
@@ -342,8 +359,8 @@ Type: ${api.subscriptionType}`
       },
       body: JSON.stringify(
         isProxy
-          ? { provider: 'anthropic', apiKey, messages, model: 'claude-3-haiku-20240307' }
-          : { model: 'claude-3-haiku-20240307', max_tokens: 1500, messages }
+          ? { provider: 'anthropic', apiKey, messages, model: 'claude-3-haiku-20240307', max_tokens: 2000 }
+          : { model: 'claude-3-haiku-20240307', max_tokens: 2000, messages }
       ),
     });
 
@@ -374,7 +391,24 @@ Type: ${api.subscriptionType}`
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
-          const parsed = JSON.parse(jsonMatch[0]);
+          let extractedJson = jsonMatch[0];
+          
+          // Check if JSON seems truncated (doesn't end with })
+          if (!extractedJson.trim().endsWith('}')) {
+            // Try to fix truncated JSON by closing open structures
+            const openBraces = (extractedJson.match(/\{/g) || []).length;
+            const closeBraces = (extractedJson.match(/\}/g) || []).length;
+            const openBrackets = (extractedJson.match(/\[/g) || []).length;
+            const closeBrackets = (extractedJson.match(/\]/g) || []).length;
+            
+            // Add missing brackets/braces
+            extractedJson += ']'.repeat(Math.max(0, openBrackets - closeBrackets));
+            extractedJson += '}'.repeat(Math.max(0, openBraces - closeBraces));
+            
+            console.warn('JSON appears truncated, attempted to fix');
+          }
+          
+          const parsed = JSON.parse(extractedJson);
           return validateComparisonResponse(parsed);
         } catch (e2) {
           console.error('Failed to parse extracted JSON:', jsonMatch[0]);
