@@ -15,7 +15,10 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
   return (
     <header className="header">
       <div className="header-content">
-        <h1>SubAlert</h1>
+        <div className="header-brand">
+          <img src="/subalert-logo.png" alt="SubAlert Logo" className="header-logo" />
+          <h1>SubAlert</h1>
+        </div>
         <div className="header-actions">
           <button className="btn btn-primary" onClick={onAddAPI}>
             + Add
