@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings } from '../types';
+import { Settings, API, Category } from '../types';
 import { telegram } from '../utils/telegram';
 import { storage } from '../utils/storage';
 import { biometric } from '../utils/biometric';
@@ -7,18 +7,21 @@ import { masterPassword, LockTimeout } from '../utils/masterPassword';
 import { useNotification } from '../hooks/useNotification';
 import BottomSheet from './BottomSheet';
 import PasswordModal from './PasswordModal';
+import PDFExportModal from './PDFExportModal';
 import ChangePasswordModal from './ChangePasswordModal';
 import './MobileSettingsModal.css';
 
 interface MobileSettingsModalProps {
   settings: Settings;
+  apis?: API[];
+  categories?: Category[];
   onSave: (settings: Settings) => void;
   onClose: () => void;
 }
 
 type SettingsSection = 'main' | 'telegram' | 'backup' | 'security';
 
-const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onSave, onClose }) => {
+const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, apis = [], categories = [], onSave, onClose }) => {
   const { showNotification } = useNotification();
   const [formData, setFormData] = useState<Settings>(settings);
   const [activeSection, setActiveSection] = useState<SettingsSection>('main');
@@ -27,6 +30,7 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showPDFExportModal, setShowPDFExportModal] = useState(false);
   const [masterPasswordEnabled, setMasterPasswordEnabled] = useState(false);
   const [lockTimeout, setLockTimeout] = useState<LockTimeout>('5min');
   const [showMasterPasswordModal, setShowMasterPasswordModal] = useState<'setup' | 'disable' | 'change' | null>(null);
@@ -292,6 +296,9 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
         <button className="btn btn-primary" onClick={() => handleExport(true)}>
           Download Encrypted Backup
         </button>
+        <button className="btn btn-secondary" onClick={() => setShowPDFExportModal(true)}>
+          Generate PDF Report
+        </button>
       </div>
 
       <div className="backup-options">
@@ -459,6 +466,16 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
           <ChangePasswordModal
             onConfirm={handleMasterPasswordChange}
             onCancel={() => setShowMasterPasswordModal(null)}
+          />
+        </div>
+      )}
+      
+      {showPDFExportModal && (
+        <div style={{ position: 'fixed', zIndex: 10000 }}>
+          <PDFExportModal
+            apis={apis}
+            categories={categories}
+            onClose={() => setShowPDFExportModal(false)}
           />
         </div>
       )}

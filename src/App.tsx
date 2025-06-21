@@ -336,12 +336,16 @@ function App() {
           isTouchDevice ? (
             <MobileSettingsModal
               settings={settings}
+              apis={apis}
+              categories={categories}
               onSave={handleSaveSettings}
               onClose={() => setShowSettingsModal(false)}
             />
           ) : (
             <SettingsModal
               settings={settings}
+              apis={apis}
+              categories={categories}
               onSave={handleSaveSettings}
               onClose={() => setShowSettingsModal(false)}
             />

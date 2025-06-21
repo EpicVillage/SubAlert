@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Settings } from '../types';
+import { Settings, API, Category } from '../types';
 import { telegram } from '../utils/telegram';
 import { storage } from '../utils/storage';
 import PasswordModal from './PasswordModal';
+import PDFExportModal from './PDFExportModal';
 import { biometric } from '../utils/biometric';
 import { masterPassword, LockTimeout } from '../utils/masterPassword';
 import { useNotification } from '../hooks/useNotification';
@@ -10,13 +11,15 @@ import ChangePasswordModal from './ChangePasswordModal';
 
 interface SettingsModalProps {
   settings: Settings;
+  apis?: API[];
+  categories?: Category[];
   onSave: (settings: Settings) => void;
   onClose: () => void;
 }
 
 type SettingsSection = 'telegram' | 'backup' | 'security' | 'ai';
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ settings, apis = [], categories = [], onSave, onClose }) => {
   const { showNotification } = useNotification();
   const [formData, setFormData] = useState<Settings>({
     telegramBotToken: '',
@@ -30,6 +33,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
   const [activeSection, setActiveSection] = useState<SettingsSection>('telegram');
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showPDFExportModal, setShowPDFExportModal] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [showImportPasswordModal, setShowImportPasswordModal] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
@@ -417,6 +421,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                       >
                         🔒 Export with Password
                       </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setShowPDFExportModal(true)}
+                        style={{ marginTop: '0.5rem' }}
+                      >
+                        📄 Generate PDF Report
+                      </button>
                     </div>
 
                     <div className="backup-card">
@@ -629,6 +641,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
         <ChangePasswordModal
           onConfirm={handleMasterPasswordChange}
           onCancel={() => setShowMasterPasswordModal(null)}
+        />
+      )}
+      
+      {showPDFExportModal && (
+        <PDFExportModal
+          apis={apis}
+          categories={categories}
+          onClose={() => setShowPDFExportModal(false)}
         />
       )}
     </div>
