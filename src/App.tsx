@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
+import CalendarView from './components/CalendarView';
 import Header from './components/Header';
 import APIModal from './components/APIModal';
 import SettingsModal from './components/SettingsModal';
@@ -320,6 +321,13 @@ function App() {
                 onToggleSelect={handleToggleSelect}
               />
             )
+          } />
+          <Route path="/calendar" element={
+            <CalendarView 
+              apis={apis}
+              categories={categories}
+              onEditAPI={handleEditAPI}
+            />
           } />
         </Routes>
         

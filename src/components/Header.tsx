@@ -1,5 +1,6 @@
 import React from 'react';
 import { useIsTouchDevice } from '../hooks/useTouch';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
   onAddAPI: () => void;
@@ -16,6 +17,10 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories, onOpenAI, selectedCount = 0, onSelectAll }) => {
   const isTouchDevice = useIsTouchDevice();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isCalendarView = location.pathname === '/calendar';
+  
   return (
     <header className="header">
       <div className="header-content">
@@ -28,19 +33,29 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
           <h1>SubAlert</h1>
         </div>
         <div className="header-actions">
-          <button className="btn btn-primary" onClick={onAddAPI}>
-            + Add
-          </button>
           <button 
-            className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
-            onClick={onToggleEditMode}
+            className={`btn ${isCalendarView ? 'btn-secondary' : 'btn-primary'}`} 
+            onClick={() => navigate(isCalendarView ? '/' : '/calendar')}
           >
-            {isEditMode ? '✓ Done' : '✏️ Edit'}
+            {isCalendarView ? '📋 List' : '📅 Calendar'}
           </button>
-          {!isTouchDevice && isEditMode && onSelectAll && (
-            <button className="btn btn-link" onClick={onSelectAll}>
-              {selectedCount > 0 ? 'Deselect All' : 'Select All'}
-            </button>
+          {!isCalendarView && (
+            <>
+              <button className="btn btn-primary" onClick={onAddAPI}>
+                + Add
+              </button>
+              <button 
+                className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
+                onClick={onToggleEditMode}
+              >
+                {isEditMode ? '✓ Done' : '✏️ Edit'}
+              </button>
+              {!isTouchDevice && isEditMode && onSelectAll && (
+                <button className="btn btn-link" onClick={onSelectAll}>
+                  {selectedCount > 0 ? 'Deselect All' : 'Select All'}
+                </button>
+              )}
+            </>
           )}
           <button className="btn btn-secondary" onClick={onOpenCategories}>
             🏷️ Categories
