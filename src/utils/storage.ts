@@ -17,6 +17,11 @@ export const storage = {
 
   saveAPIs: (apis: API[]) => {
     localStorage.setItem(STORAGE_KEYS.APIS, JSON.stringify(apis));
+    // Update activity time for master password
+    const masterPasswordEnabled = localStorage.getItem('subalert_master_password_enabled');
+    if (masterPasswordEnabled === 'true') {
+      localStorage.setItem('subalert_master_password_last_unlock', Date.now().toString());
+    }
   },
 
   getSettings: (): Settings => {
@@ -29,6 +34,11 @@ export const storage = {
 
   saveSettings: (settings: Settings) => {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    // Update activity time for master password
+    const masterPasswordEnabled = localStorage.getItem('subalert_master_password_enabled');
+    if (masterPasswordEnabled === 'true') {
+      localStorage.setItem('subalert_master_password_last_unlock', Date.now().toString());
+    }
   },
 
   getNotificationLogs: (): NotificationLog[] => {
@@ -47,6 +57,11 @@ export const storage = {
 
   saveCategories: (categories: Category[]) => {
     localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+    // Update activity time for master password
+    const masterPasswordEnabled = localStorage.getItem('subalert_master_password_enabled');
+    if (masterPasswordEnabled === 'true') {
+      localStorage.setItem('subalert_master_password_last_unlock', Date.now().toString());
+    }
   },
 
   exportData: (password?: string) => {

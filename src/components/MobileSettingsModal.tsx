@@ -3,9 +3,11 @@ import { Settings } from '../types';
 import { telegram } from '../utils/telegram';
 import { storage } from '../utils/storage';
 import { biometric } from '../utils/biometric';
+import { masterPassword, LockTimeout } from '../utils/masterPassword';
 import { useNotification } from '../hooks/useNotification';
 import BottomSheet from './BottomSheet';
 import PasswordModal from './PasswordModal';
+import ChangePasswordModal from './ChangePasswordModal';
 import './MobileSettingsModal.css';
 
 interface MobileSettingsModalProps {
@@ -25,12 +27,17 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [masterPasswordEnabled, setMasterPasswordEnabled] = useState(false);
+  const [lockTimeout, setLockTimeout] = useState<LockTimeout>('5min');
+  const [showMasterPasswordModal, setShowMasterPasswordModal] = useState<'setup' | 'disable' | 'change' | null>(null);
 
   useEffect(() => {
     biometric.isAvailable().then(available => {
       setBiometricAvailable(available);
       setBiometricEnabled(biometric.isEnabled());
     });
+    setMasterPasswordEnabled(masterPassword.isEnabled());
+    setLockTimeout(masterPassword.getLockTimeout());
   }, []);
 
   const handleTestConnection = async () => {
@@ -82,6 +89,38 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
     storage.exportData(password);
     showNotification('success', 'Backup Complete', 'Encrypted backup downloaded');
     setShowPasswordModal(false);
+  };
+
+  const handleMasterPasswordSetup = async (password: string) => {
+    const success = await masterPassword.setup(password);
+    if (success) {
+      setMasterPasswordEnabled(true);
+      showNotification('success', 'Security', 'Master password enabled');
+    } else {
+      showNotification('error', 'Security Error', 'Failed to setup master password');
+    }
+    setShowMasterPasswordModal(null);
+  };
+
+  const handleMasterPasswordDisable = async (password: string) => {
+    const success = await masterPassword.disable(password);
+    if (success) {
+      setMasterPasswordEnabled(false);
+      showNotification('success', 'Security', 'Master password disabled');
+    } else {
+      showNotification('error', 'Security Error', 'Incorrect password');
+    }
+    setShowMasterPasswordModal(null);
+  };
+
+  const handleMasterPasswordChange = async (currentPassword: string, newPassword: string) => {
+    const success = await masterPassword.change(currentPassword, newPassword);
+    if (success) {
+      showNotification('success', 'Security', 'Master password changed');
+    } else {
+      showNotification('error', 'Security Error', 'Incorrect current password');
+    }
+    setShowMasterPasswordModal(null);
   };
 
   const handleImport = async (file: File, password?: string) => {
@@ -292,6 +331,67 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
           <p>Biometric authentication is not available on this device.</p>
         </div>
       )}
+      
+      <div className="form-group">
+        <div className="toggle-container">
+          <div className="toggle-content">
+            <h4>Master Password</h4>
+            <p className="toggle-description">
+              Encrypt all data with a master password
+            </p>
+          </div>
+          <label htmlFor="masterPassword" className="toggle-switch">
+            <input
+              type="checkbox"
+              id="masterPassword"
+              checked={masterPasswordEnabled}
+              onChange={() => {
+                if (masterPasswordEnabled) {
+                  setShowMasterPasswordModal('disable');
+                } else {
+                  setShowMasterPasswordModal('setup');
+                }
+              }}
+              className="toggle-input"
+            />
+            <span className="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      {masterPasswordEnabled && (
+        <div className="form-group">
+          <label>Lock Timeout</label>
+          <select
+            value={lockTimeout}
+            onChange={(e) => {
+              const timeout = e.target.value as LockTimeout;
+              setLockTimeout(timeout);
+              masterPassword.setLockTimeout(timeout);
+            }}
+            className="form-select"
+          >
+            <option value="immediately">Immediately</option>
+            <option value="1min">After 1 minute</option>
+            <option value="5min">After 5 minutes</option>
+            <option value="15min">After 15 minutes</option>
+            <option value="30min">After 30 minutes</option>
+            <option value="1hour">After 1 hour</option>
+            <option value="never">Never</option>
+          </select>
+        </div>
+      )}
+      
+      {masterPasswordEnabled && (
+        <div className="form-group">
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowMasterPasswordModal('change')}
+          >
+            Change Master Password
+          </button>
+        </div>
+      )}
     </div>
   );
 
@@ -314,6 +414,34 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
           description="Enter a password to encrypt your backup file"
           onConfirm={handlePasswordExport}
           onCancel={() => setShowPasswordModal(false)}
+        />
+      )}
+      
+      {showMasterPasswordModal === 'setup' && (
+        <PasswordModal
+          title="Setup Master Password"
+          description="Create a master password to encrypt all your data"
+          confirmButtonText="Setup"
+          showConfirmPassword={true}
+          onConfirm={handleMasterPasswordSetup}
+          onCancel={() => setShowMasterPasswordModal(null)}
+        />
+      )}
+      
+      {showMasterPasswordModal === 'disable' && (
+        <PasswordModal
+          title="Disable Master Password"
+          description="Enter your current master password to disable encryption"
+          confirmButtonText="Disable"
+          onConfirm={handleMasterPasswordDisable}
+          onCancel={() => setShowMasterPasswordModal(null)}
+        />
+      )}
+      
+      {showMasterPasswordModal === 'change' && (
+        <ChangePasswordModal
+          onConfirm={handleMasterPasswordChange}
+          onCancel={() => setShowMasterPasswordModal(null)}
         />
       )}
     </>

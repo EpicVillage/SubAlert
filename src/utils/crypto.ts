@@ -1,5 +1,37 @@
 // Simple encryption/decryption for password-protected exports
 export const crypto = {
+  // Generate a random salt
+  generateSalt(): string {
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    return btoa(String.fromCharCode.apply(null, Array.from(salt)));
+  },
+
+  // Hash a password with salt
+  async hashPassword(password: string, salt: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const saltBuffer = Uint8Array.from(atob(salt), c => c.charCodeAt(0));
+    
+    const keyMaterial = await window.crypto.subtle.importKey(
+      'raw',
+      encoder.encode(password),
+      'PBKDF2',
+      false,
+      ['deriveBits']
+    );
+    
+    const hashBuffer = await window.crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: saltBuffer,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      256
+    );
+    
+    return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(hashBuffer))));
+  },
   // Encrypt data with password
   async encrypt(data: string, password: string): Promise<string> {
     const encoder = new TextEncoder();

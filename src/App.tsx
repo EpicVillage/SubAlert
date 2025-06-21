@@ -8,6 +8,7 @@ import MobileSettingsModal from './components/MobileSettingsModal';
 import CategoryManager from './components/CategoryManager';
 import ConfirmModal from './components/ConfirmModal';
 import BiometricLock from './components/BiometricLock';
+import MasterPasswordLock from './components/MasterPasswordLock';
 import { AISettings } from './components/AISettings';
 import { AIRecommendations } from './components/AIRecommendations';
 import { AIMenu } from './components/AIMenu';
@@ -18,6 +19,7 @@ import { setupNotificationScheduler } from './utils/notificationScheduler';
 import { useTheme } from './hooks/useTheme';
 import { useIsTouchDevice } from './hooks/useTouch';
 import { biometric } from './utils/biometric';
+import { masterPassword } from './utils/masterPassword';
 import './App.css';
 
 function App() {
@@ -38,6 +40,7 @@ function App() {
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
   const { theme, toggleTheme } = useTheme();
   const [isLocked, setIsLocked] = useState(false);
+  const [isMasterPasswordLocked, setIsMasterPasswordLocked] = useState(false);
   const [showAIModal, setShowAIModal] = useState<'menu' | 'settings' | 'recommendations' | null>(null);
   const isTouchDevice = useIsTouchDevice();
 
@@ -48,6 +51,11 @@ function App() {
     // Check if biometric lock is needed
     if (biometric.needsAuthentication()) {
       setIsLocked(true);
+    }
+    
+    // Check if master password lock is needed
+    if (masterPassword.needsUnlock()) {
+      setIsMasterPasswordLocked(true);
     }
     
     // Set up activity tracking
@@ -157,6 +165,10 @@ function App() {
       <div className="App">
         {isLocked && (
           <BiometricLock onAuthenticated={() => setIsLocked(false)} />
+        )}
+        
+        {isMasterPasswordLocked && (
+          <MasterPasswordLock onUnlocked={() => setIsMasterPasswordLocked(false)} />
         )}
         
         <Header 
