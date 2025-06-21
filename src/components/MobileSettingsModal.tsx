@@ -302,6 +302,7 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
       {showPasswordModal && (
         <PasswordModal
           title="Encrypt Backup"
+          description="Enter a password to encrypt your backup file"
           onConfirm={handlePasswordExport}
           onCancel={() => setShowPasswordModal(false)}
         />
