@@ -1,0 +1,90 @@
+.export-options-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  padding: 0;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  animation: modalSlideIn 0.2s ease-out;
+}
+
+[data-theme='dark'] .export-options-modal {
+  background: rgba(30, 30, 30, 0.95);
+}
+
+.export-options-content {
+  padding: 2rem;
+}
+
+.export-options-message {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.export-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.export-option-card {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.export-option-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.export-option-card.primary {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.export-option-card.primary:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.export-option-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.export-option-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.export-option-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.export-option-card.primary:hover p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 768px) {
+  .export-options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .export-option-card {
+    padding: 1.5rem;
+  }
+}

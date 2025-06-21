@@ -26,7 +26,13 @@
 .bulk-actions-info {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+}
+
+.bulk-actions-info > div {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .selected-count {

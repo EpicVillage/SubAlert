@@ -8,6 +8,8 @@ import MobileSettingsModal from './components/MobileSettingsModal';
 import CategoryManager from './components/CategoryManager';
 import ConfirmModal from './components/ConfirmModal';
 import MasterPasswordLock from './components/MasterPasswordLock';
+import PasswordModal from './components/PasswordModal';
+import ExportOptionsModal from './components/ExportOptionsModal';
 import { AISettings } from './components/AISettings';
 import { AIRecommendations } from './components/AIRecommendations';
 import { AIMenu } from './components/AIMenu';
@@ -16,12 +18,14 @@ import BulkActionsToolbar from './components/BulkActionsToolbar';
 import { API, Settings, Category } from './types';
 import { storage } from './utils/storage';
 import { setupNotificationScheduler } from './utils/notificationScheduler';
+import { useNotification } from './hooks/useNotification';
 import { useTheme } from './hooks/useTheme';
 import { useIsTouchDevice } from './hooks/useTouch';
 import { masterPassword } from './utils/masterPassword';
 import './App.css';
 
 function App() {
+  const { showNotification } = useNotification();
   const [apis, setApis] = useState<API[]>(() => {
     // Initialize state directly from storage
     return storage.getAPIs();
@@ -39,6 +43,8 @@ function App() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+  const [showBulkExportOptions, setShowBulkExportOptions] = useState(false);
+  const [showBulkExportPasswordModal, setShowBulkExportPasswordModal] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const [isMasterPasswordLocked, setIsMasterPasswordLocked] = useState(false);
   const [showAIModal, setShowAIModal] = useState<'menu' | 'settings' | 'recommendations' | null>(null);
@@ -211,7 +217,10 @@ function App() {
 
   const handleBulkExport = () => {
     if (selectedIds.size === 0) return;
-    
+    setShowBulkExportOptions(true);
+  };
+
+  const handleBulkExportWithoutPassword = () => {
     const selectedApis = apis.filter(api => selectedIds.has(api.id));
     const dataStr = JSON.stringify(selectedApis, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -224,6 +233,37 @@ function App() {
     linkElement.click();
     
     setSelectedIds(new Set());
+    setShowBulkExportOptions(false);
+    showNotification('success', 'Export Successful', `Exported ${selectedApis.length} subscription${selectedApis.length > 1 ? 's' : ''}`);
+  };
+
+  const handleBulkExportWithPassword = (password: string) => {
+    const selectedApis = apis.filter(api => selectedIds.has(api.id));
+    
+    // Import crypto for encryption
+    import('./utils/crypto').then(async ({ crypto }) => {
+      const dataStr = JSON.stringify(selectedApis);
+      const encrypted = await crypto.encrypt(dataStr, password);
+      const exportData = {
+        encrypted: true,
+        data: encrypted
+      };
+      
+      const exportStr = JSON.stringify(exportData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(exportStr);
+      
+      const exportFileDefaultName = `subalert-export-encrypted-${new Date().toISOString().split('T')[0]}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      setSelectedIds(new Set());
+      setShowBulkExportPasswordModal(false);
+      setShowBulkExportOptions(false);
+      showNotification('success', 'Export Successful', `Exported ${selectedApis.length} encrypted subscription${selectedApis.length > 1 ? 's' : ''}`);
+    });
   };
 
   return (
@@ -368,11 +408,34 @@ function App() {
         {isEditMode && selectedIds.size > 0 && (
           <BulkActionsToolbar
             selectedCount={selectedIds.size}
+            totalCount={apis.length}
             categories={categories}
             onDelete={handleBulkDelete}
             onCategoryChange={handleBulkCategoryChange}
             onExport={handleBulkExport}
             onClearSelection={handleClearSelection}
+            onSelectAll={handleSelectAll}
+          />
+        )}
+        
+        {showBulkExportOptions && (
+          <ExportOptionsModal
+            selectedCount={selectedIds.size}
+            onExportWithPassword={() => {
+              setShowBulkExportOptions(false);
+              setShowBulkExportPasswordModal(true);
+            }}
+            onExportWithoutPassword={handleBulkExportWithoutPassword}
+            onClose={() => setShowBulkExportOptions(false)}
+          />
+        )}
+        
+        {showBulkExportPasswordModal && (
+          <PasswordModal
+            title="Set Export Password"
+            description="Enter a password to encrypt your export file:"
+            onConfirm={handleBulkExportWithPassword}
+            onCancel={() => setShowBulkExportPasswordModal(false)}
           />
         )}
       </div>

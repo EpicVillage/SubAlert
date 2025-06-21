@@ -4,20 +4,24 @@ import './BulkActionsToolbar.css';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
+  totalCount?: number;
   categories: Category[];
   onDelete: () => void;
   onCategoryChange: (categoryId: string) => void;
   onExport: () => void;
   onClearSelection: () => void;
+  onSelectAll?: () => void;
 }
 
 const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
   selectedCount,
+  totalCount,
   categories,
   onDelete,
   onCategoryChange,
   onExport,
-  onClearSelection
+  onClearSelection,
+  onSelectAll
 }) => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
@@ -27,9 +31,16 @@ const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
     <div className="bulk-actions-toolbar">
       <div className="bulk-actions-info">
         <span className="selected-count">{selectedCount} selected</span>
-        <button className="btn-link" onClick={onClearSelection}>
-          Clear
-        </button>
+        <div>
+          {onSelectAll && totalCount && selectedCount !== totalCount && (
+            <button className="btn-link" onClick={onSelectAll}>
+              Select All
+            </button>
+          )}
+          <button className="btn-link" onClick={onClearSelection}>
+            Clear
+          </button>
+        </div>
       </div>
       
       <div className="bulk-actions-buttons">
