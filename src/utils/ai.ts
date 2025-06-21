@@ -119,9 +119,11 @@ Be specific with service names and avoid generic advice.`
     const messages = [
       {
         role: 'system',
-        content: `You are a feature comparison expert. Analyze the given service and provide detailed comparisons with 2-3 alternatives. Return ONLY valid JSON without any markdown formatting or code blocks.
+        content: `You are a feature comparison expert. Analyze the given service and provide detailed comparisons with 2-3 alternatives. 
 
-The response must be a valid JSON object with this exact structure:
+CRITICAL: Return ONLY the JSON object below, nothing else. No explanations, no markdown, no code blocks, just raw JSON.
+
+The response must be exactly this structure:
 {
   "currentService": {
     "name": "string",
@@ -151,15 +153,15 @@ The response must be a valid JSON object with this exact structure:
 }
 
 Rules:
-- Use actual boolean values (true/false) not strings for current/alternative
-- Use actual numbers for cost and savings, not strings
-- billingCycle must be EXACTLY "monthly" or "yearly" (not "N/A", "one-time", etc)
-- If a service is free or has no recurring billing, use "monthly" with cost 0
+- Return ONLY valid JSON, no explanations or text
+- Use boolean true/false (not "true" or "false" strings)
+- Use numbers like 50 not "50" for cost and savings
+- billingCycle must be exactly "monthly" or "yearly" only
 - importance must be exactly "high", "medium", or "low"
-- Include 5-8 specific features for comparison
-- Calculate real savings percentage as a number
-- Do NOT include any text before or after the JSON
-- Do NOT wrap the JSON in markdown code blocks`
+- If free, use cost: 0 and billingCycle: "monthly"
+- savings should be a percentage number (0-100)
+- Include 5-8 features per alternative
+- Ensure JSON is properly formatted with correct commas and brackets`
       },
       {
         role: 'user',
@@ -169,7 +171,9 @@ Description: ${api.serviceDescription || 'No description provided'}
 Website: ${api.website || 'No website provided'}
 Cost: $${api.cost || 0}/${api.billingCycle || 'monthly'}
 Category: ${api.category}
-Type: ${api.subscriptionType}`
+Type: ${api.subscriptionType}
+
+Remember: Return ONLY the JSON object, no other text.`
       }
     ];
 
@@ -223,6 +227,11 @@ Type: ${api.subscriptionType}`
         }
       }
       console.error('Failed to parse AI response:', content);
+      console.error('Parse error:', e);
+      // Try to provide more specific error
+      if (content.includes('```')) {
+        throw new Error('AI returned markdown-formatted code. Please try again.');
+      }
       throw new Error(`Failed to parse AI response: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
@@ -373,6 +382,11 @@ Type: ${api.subscriptionType}`
         }
       }
       console.error('Failed to parse AI response:', content);
+      console.error('Parse error:', e);
+      // Try to provide more specific error
+      if (content.includes('```')) {
+        throw new Error('AI returned markdown-formatted code. Please try again.');
+      }
       throw new Error(`Failed to parse AI response: ${e instanceof Error ? e.message : String(e)}`);
     }
   }

@@ -46,6 +46,7 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
   };
 
   return (
+    <>
     <div className={`api-card ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}>
       <div className="api-card-header">
         <h3>{api.serviceName}</h3>
@@ -180,13 +181,15 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
         </div>
       )}
 
-      {showComparison && (
-        <FeatureComparison 
-          api={api} 
-          onClose={() => setShowComparison(false)} 
-        />
-      )}
     </div>
+    
+    {showComparison && (
+      <FeatureComparison 
+        api={api} 
+        onClose={() => setShowComparison(false)} 
+      />
+    )}
+    </>
   );
 };
 
