@@ -1,0 +1,258 @@
+.feature-comparison-modal {
+  max-width: 900px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.current-service-summary {
+  margin-bottom: 2rem;
+}
+
+.current-service-summary h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.service-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.service-card h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.service-card .cost {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.feature-tag {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.alternatives-section h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.alternative-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.alternative-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.alternative-header h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.alternative-header .cost {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.savings-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.savings-high {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.savings-medium {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.savings-low {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.savings-none {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.feature-comparison-table {
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.feature-comparison-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.feature-comparison-table th {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.feature-comparison-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.feature-value {
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.feature-upgrade {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.feature-downgrade {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.importance-high {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.importance-medium {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.importance-low {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+.pros-cons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.pros h5, .cons h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.pros h5 {
+  color: #22c55e;
+}
+
+.cons h5 {
+  color: #ef4444;
+}
+
+.pros ul, .cons ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pros li, .cons li {
+  padding-left: 1.5rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.pros li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #22c55e;
+}
+
+.cons li:before {
+  content: "✗";
+  position: absolute;
+  left: 0;
+  color: #ef4444;
+}
+
+.recommendation {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.recommendation p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 3rem;
+}
+
+.loading-container p {
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 768px) {
+  .feature-comparison-modal {
+    width: 95%;
+  }
+
+  .pros-cons {
+    grid-template-columns: 1fr;
+  }
+
+  .alternative-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .feature-comparison-table {
+    font-size: 0.85rem;
+  }
+}

@@ -135,6 +135,20 @@ body {
   border-color: var(--text-tertiary);
 }
 
+.compare-btn {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.compare-btn:before {
+  content: "📊";
+}
+
 .btn-danger {
   background-color: var(--danger);
   color: white;

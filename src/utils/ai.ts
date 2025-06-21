@@ -3,6 +3,7 @@ import { API } from '../types';
 interface AIProvider {
   name: string;
   getRecommendations: (apiKey: string, subscriptions: API[], budget?: number) => Promise<string>;
+  getFeatureComparison: (apiKey: string, api: API) => Promise<any>;
 }
 
 // Helper function to determine if we should use the proxy
@@ -77,6 +78,93 @@ Be specific with service names and avoid generic advice.`
 
     const data = await response.json();
     return data.choices[0].message.content;
+  },
+
+  getFeatureComparison: async (apiKey: string, api: API) => {
+    const endpoint = getApiEndpoint('openai');
+    const messages = [
+      {
+        role: 'system',
+        content: `You are a feature comparison expert. Analyze the given service and provide detailed comparisons with 2-3 alternatives. Return a JSON response in this exact format:
+{
+  "currentService": {
+    "name": "Service Name",
+    "features": ["feature1", "feature2", "feature3"],
+    "cost": number,
+    "billingCycle": "monthly|yearly"
+  },
+  "alternatives": [
+    {
+      "name": "Alternative Service Name",
+      "cost": number,
+      "billingCycle": "monthly|yearly",
+      "features": [
+        {
+          "name": "Feature name",
+          "current": true|false|"value",
+          "alternative": true|false|"value",
+          "importance": "high|medium|low"
+        }
+      ],
+      "pros": ["Pro 1", "Pro 2"],
+      "cons": ["Con 1", "Con 2"],
+      "savings": percentage_saved,
+      "recommendation": "Brief recommendation explaining when this alternative makes sense"
+    }
+  ]
+}
+
+Important:
+- Include specific feature comparisons (at least 5-8 features)
+- Calculate actual savings percentage
+- Be specific about what features are gained or lost
+- Consider the service description when finding alternatives`
+      },
+      {
+        role: 'user',
+        content: `Compare this service with alternatives:
+Name: ${api.serviceName}
+Description: ${api.serviceDescription || 'No description provided'}
+Cost: $${api.cost || 0}/${api.billingCycle || 'monthly'}
+Category: ${api.category}
+Type: ${api.subscriptionType}`
+      }
+    ];
+
+    const isProxy = endpoint.includes('/api/');
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(isProxy ? {} : { 'Authorization': `Bearer ${apiKey}` }),
+      },
+      body: JSON.stringify(
+        isProxy 
+          ? { provider: 'openai', apiKey, messages, model: 'gpt-3.5-turbo' }
+          : { model: 'gpt-3.5-turbo', messages, temperature: 0.3, max_tokens: 1500 }
+      ),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to get comparison' }));
+      throw new Error(error.error?.message || error.error || 'Failed to get comparison');
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    // Parse the JSON response
+    try {
+      return JSON.parse(content);
+    } catch (e) {
+      // If parsing fails, try to extract JSON from the response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error('Failed to parse AI response');
+    }
   }
 };
 
@@ -124,6 +212,88 @@ const anthropicProvider: AIProvider = {
 
     const data = await response.json();
     return data.content[0].text;
+  },
+
+  getFeatureComparison: async (apiKey: string, api: API) => {
+    const endpoint = getApiEndpoint('anthropic');
+    const messages = [
+      {
+        role: 'user',
+        content: `As a feature comparison expert, analyze this service and provide detailed comparisons with 2-3 alternatives. Return ONLY a JSON response in this exact format:
+{
+  "currentService": {
+    "name": "Service Name",
+    "features": ["feature1", "feature2", "feature3"],
+    "cost": number,
+    "billingCycle": "monthly|yearly"
+  },
+  "alternatives": [
+    {
+      "name": "Alternative Service Name",
+      "cost": number,
+      "billingCycle": "monthly|yearly",
+      "features": [
+        {
+          "name": "Feature name",
+          "current": true|false|"value",
+          "alternative": true|false|"value",
+          "importance": "high|medium|low"
+        }
+      ],
+      "pros": ["Pro 1", "Pro 2"],
+      "cons": ["Con 1", "Con 2"],
+      "savings": percentage_saved,
+      "recommendation": "Brief recommendation explaining when this alternative makes sense"
+    }
+  ]
+}
+
+Service to analyze:
+Name: ${api.serviceName}
+Description: ${api.serviceDescription || 'No description provided'}
+Cost: $${api.cost || 0}/${api.billingCycle || 'monthly'}
+Category: ${api.category}
+Type: ${api.subscriptionType}`
+      }
+    ];
+
+    const isProxy = endpoint.includes('/api/');
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(isProxy ? {} : {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        }),
+      },
+      body: JSON.stringify(
+        isProxy
+          ? { provider: 'anthropic', apiKey, messages, model: 'claude-3-haiku-20240307' }
+          : { model: 'claude-3-haiku-20240307', max_tokens: 1500, messages }
+      ),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to get comparison' }));
+      throw new Error(error.error?.message || error.error || 'Failed to get comparison');
+    }
+
+    const data = await response.json();
+    const content = data.content[0].text;
+    
+    // Parse the JSON response
+    try {
+      return JSON.parse(content);
+    } catch (e) {
+      // If parsing fails, try to extract JSON from the response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error('Failed to parse AI response');
+    }
   }
 };
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { API, Category } from '../types';
 import { differenceInDays, parseISO, format } from 'date-fns';
 import { getCategoryById } from '../utils/categories';
+import FeatureComparison from './FeatureComparison';
 
 interface APICardProps {
   api: API;
@@ -14,6 +15,7 @@ interface APICardProps {
 const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, isEditMode = false }) => {
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
   const getDaysLeft = () => {
     if (!api.expiryDate) return null;
@@ -115,6 +117,18 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
             <p className="api-notes">{api.notes}</p>
           </div>
         )}
+
+        {api.subscriptionType === 'paid' && (
+          <div className="api-field">
+            <button 
+              className="btn btn-secondary compare-btn"
+              onClick={() => setShowComparison(true)}
+              style={{ marginTop: '0.5rem' }}
+            >
+              Compare Alternatives
+            </button>
+          </div>
+        )}
       </div>
 
       {isEditMode && (
@@ -135,6 +149,13 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
             <span>Delete</span>
           </button>
         </div>
+      )}
+
+      {showComparison && (
+        <FeatureComparison 
+          api={api} 
+          onClose={() => setShowComparison(false)} 
+        />
       )}
     </div>
   );
