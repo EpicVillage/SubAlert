@@ -29,22 +29,29 @@ const openAIProvider: AIProvider = {
     const messages = [
       {
         role: 'system',
-        content: `You are a subscription optimization assistant. Analyze the user's subscriptions and provide actionable recommendations to:
-1. Save money by identifying redundant services
-2. Suggest better alternatives
-3. Identify subscriptions that might be forgotten
-4. Recommend bundling opportunities
-Keep responses concise and practical.`
+        content: `You are a subscription optimization assistant. Analyze the user's subscriptions and provide specific alternative services that could replace or improve upon their current subscriptions. Focus on:
+1. Suggesting cheaper alternatives that provide similar functionality
+2. Identifying services that could be replaced with free alternatives
+3. Recommending bundled services that could replace multiple subscriptions
+4. Finding better value options in the same category
+
+For each recommendation, mention:
+- The specific alternative service name
+- How much they could save
+- What features they might gain or lose
+
+Be specific with service names and avoid generic advice.`
       },
       {
         role: 'user',
         content: `Here are my current subscriptions: ${JSON.stringify(subscriptions.map(s => ({
           name: s.serviceName,
+          description: s.serviceDescription || 'No description provided',
           cost: s.cost,
           billingCycle: s.billingCycle,
           category: s.category,
           subscriptionType: s.subscriptionType
-        })))}. ${budget ? `My monthly budget is $${budget}.` : ''} What optimizations do you recommend?`
+        })))}. ${budget ? `My monthly budget is $${budget}.` : ''} What specific alternative services do you recommend?`
       }
     ];
 
@@ -81,8 +88,9 @@ const anthropicProvider: AIProvider = {
     const messages = [
       {
         role: 'user',
-        content: `As a subscription optimization assistant, analyze these subscriptions and provide money-saving recommendations: ${JSON.stringify(subscriptions.map(s => ({
+        content: `As a subscription optimization assistant, analyze these subscriptions and suggest specific alternative services that could save money or provide better value. For each subscription, recommend concrete alternatives with service names and potential savings: ${JSON.stringify(subscriptions.map(s => ({
           name: s.serviceName,
+          description: s.serviceDescription || 'No description provided',
           cost: s.cost,
           billingCycle: s.billingCycle,
           category: s.category,

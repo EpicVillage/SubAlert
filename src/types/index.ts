@@ -9,6 +9,7 @@ export interface Category {
 export interface API {
   id: string;
   serviceName: string;
+  serviceDescription?: string; // What does this service do?
   apiKey: string;
   email: string;
   subscriptionType: 'free' | 'paid';

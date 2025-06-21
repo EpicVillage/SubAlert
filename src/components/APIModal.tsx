@@ -11,6 +11,7 @@ interface APIModalProps {
 const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose }) => {
   const [formData, setFormData] = useState({
     serviceName: '',
+    serviceDescription: '',
     apiKey: '',
     email: '',
     subscriptionType: 'free' as 'free' | 'paid',
@@ -29,6 +30,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     if (api) {
       setFormData({
         serviceName: api.serviceName,
+        serviceDescription: api.serviceDescription || '',
         apiKey: api.apiKey,
         email: api.email,
         subscriptionType: api.subscriptionType,
@@ -89,6 +91,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     const apiData: API = {
       id: api?.id || Date.now().toString(),
       serviceName: formData.serviceName,
+      serviceDescription: formData.serviceDescription || undefined,
       apiKey: formData.apiKey,
       email: formData.email,
       subscriptionType: formData.subscriptionType,
@@ -127,6 +130,17 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
                 }
               }}
               placeholder="e.g., OpenAI, Telegram Bot"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="serviceDescription">What does this service do?</label>
+            <textarea
+              id="serviceDescription"
+              rows={2}
+              value={formData.serviceDescription}
+              onChange={(e) => setFormData({ ...formData, serviceDescription: e.target.value })}
+              placeholder="e.g., AI language model API for text generation, chatbots, and content creation"
             />
           </div>
 
