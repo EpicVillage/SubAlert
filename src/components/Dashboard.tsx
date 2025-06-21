@@ -113,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
           <input
             type="text"
             className="search-input"
-            placeholder="Search APIs..."
+            placeholder="Search Subs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -134,7 +134,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
             value={filterType}
             onChange={(e) => setFilterType(e.target.value as any)}
           >
-            <option value="all">All APIs</option>
+            <option value="all">All Subs</option>
             <option value="expiring">Expiring Soon</option>
             <option value="paid">Paid</option>
             <option value="free">Free</option>
@@ -175,7 +175,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
                 <circle cx="60" cy="60" r="40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="5 5" opacity="0.2"/>
                 <path d="M45 60L55 70L75 50" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.2"/>
               </svg>
-              <p>No APIs found. {apis.length === 0 ? 'Add your first API to get started!' : 'Try adjusting your filters.'}</p>
+              <p>No Subs found. {apis.length === 0 ? 'Add your first subscription to get started!' : 'Try adjusting your filters.'}</p>
             </div>
           )}
         </div>
