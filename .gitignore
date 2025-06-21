@@ -153,3 +153,17 @@ temp/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Windows Zone Identifier files
+*.Identifier
+*:Zone.Identifier
+
+# Test import files
+test-import*.json
+
+# Duplicate assets in root
+/*.ttf
+/*.svg
+/*.png
+/*.jpg
+/*.jpeg
