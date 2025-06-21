@@ -33,12 +33,6 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
           <h1>SubAlert</h1>
         </div>
         <div className="header-actions">
-          <button 
-            className={`btn ${isCalendarView ? 'btn-secondary' : 'btn-primary'}`} 
-            onClick={() => navigate(isCalendarView ? '/' : '/calendar')}
-          >
-            {isCalendarView ? '📋 List' : '📅 Calendar'}
-          </button>
           {!isCalendarView && (
             <>
               <button className="btn btn-primary" onClick={onAddAPI}>
@@ -55,10 +49,18 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
                   {selectedCount > 0 ? 'Deselect All' : 'Select All'}
                 </button>
               )}
+              {isEditMode && (
+                <button className="btn btn-secondary" onClick={onOpenCategories}>
+                  🏷️ Categories
+                </button>
+              )}
             </>
           )}
-          <button className="btn btn-secondary" onClick={onOpenCategories}>
-            🏷️ Categories
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => navigate(isCalendarView ? '/' : '/calendar')}
+          >
+            {isCalendarView ? '📋 List' : '📅 Calendar'}
           </button>
           <button className="btn btn-secondary" onClick={onOpenAI}>
             🤖 AI

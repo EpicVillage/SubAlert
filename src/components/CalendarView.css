@@ -52,6 +52,8 @@
   font-family: inherit;
   background: var(--bg-primary);
   color: var(--text-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .rbc-header {
