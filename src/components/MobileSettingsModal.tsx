@@ -57,7 +57,7 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
       setBiometricEnabled(false);
       showNotification('success', 'Security', 'Biometric lock disabled');
     } else {
-      const success = await biometric.enable();
+      const success = await biometric.register();
       if (success) {
         setBiometricEnabled(true);
         showNotification('success', 'Security', 'Biometric lock enabled');
