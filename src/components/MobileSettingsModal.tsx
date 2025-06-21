@@ -261,22 +261,24 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
       
       {biometricAvailable ? (
         <div className="form-group">
-          <label htmlFor="biometricLock" className="toggle-label">
-            <div>
-              <span>Biometric Lock</span>
+          <div className="toggle-container">
+            <div className="toggle-content">
+              <h4>Biometric Lock</h4>
               <p className="toggle-description">
                 Use fingerprint or Face ID to unlock the app
               </p>
             </div>
-            <input
-              type="checkbox"
-              id="biometricLock"
-              checked={biometricEnabled}
-              onChange={handleBiometricToggle}
-              className="toggle-input"
-            />
-            <span className="toggle-slider"></span>
-          </label>
+            <label htmlFor="biometricLock" className="toggle-switch">
+              <input
+                type="checkbox"
+                id="biometricLock"
+                checked={biometricEnabled}
+                onChange={handleBiometricToggle}
+                className="toggle-input"
+              />
+              <span className="toggle-slider"></span>
+            </label>
+          </div>
         </div>
       ) : (
         <div className="info-message">
