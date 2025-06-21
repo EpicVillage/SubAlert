@@ -5,6 +5,7 @@ import { storage } from '../utils/storage';
 import { biometric } from '../utils/biometric';
 import { useNotification } from '../hooks/useNotification';
 import BottomSheet from './BottomSheet';
+import PasswordModal from './PasswordModal';
 import './MobileSettingsModal.css';
 
 interface MobileSettingsModalProps {
@@ -23,6 +24,7 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
   const [showToken, setShowToken] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     biometric.isAvailable().then(available => {
@@ -68,9 +70,18 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
   };
 
   const handleExport = (encrypted: boolean) => {
-    storage.exportData(encrypted).then(() => {
-      showNotification('success', 'Backup Complete', encrypted ? 'Encrypted backup downloaded' : 'Backup downloaded');
-    });
+    if (encrypted) {
+      setShowPasswordModal(true);
+    } else {
+      storage.exportData();
+      showNotification('success', 'Backup Complete', 'Backup downloaded');
+    }
+  };
+
+  const handlePasswordExport = (password: string) => {
+    storage.exportData(password);
+    showNotification('success', 'Backup Complete', 'Encrypted backup downloaded');
+    setShowPasswordModal(false);
   };
 
   const handleImport = async (file: File, password?: string) => {
@@ -276,16 +287,26 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
   );
 
   return (
-    <BottomSheet
-      isOpen={true}
-      onClose={onClose}
-      title="Settings"
-    >
-      {activeSection === 'main' && renderMainMenu()}
-      {activeSection === 'telegram' && renderTelegramSection()}
-      {activeSection === 'backup' && renderBackupSection()}
-      {activeSection === 'security' && renderSecuritySection()}
-    </BottomSheet>
+    <>
+      <BottomSheet
+        isOpen={true}
+        onClose={onClose}
+        title="Settings"
+      >
+        {activeSection === 'main' && renderMainMenu()}
+        {activeSection === 'telegram' && renderTelegramSection()}
+        {activeSection === 'backup' && renderBackupSection()}
+        {activeSection === 'security' && renderSecuritySection()}
+      </BottomSheet>
+      
+      {showPasswordModal && (
+        <PasswordModal
+          title="Encrypt Backup"
+          onConfirm={handlePasswordExport}
+          onCancel={() => setShowPasswordModal(false)}
+        />
+      )}
+    </>
   );
 };
 
