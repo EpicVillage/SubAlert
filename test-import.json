@@ -1,0 +1,35 @@
+{
+  "apis": [
+    {
+      "id": "test-123",
+      "name": "Test API",
+      "description": "Testing import",
+      "apiKey": "test-key-123",
+      "expiryDate": "2024-12-31",
+      "telegramId": "@testuser",
+      "category": "entertainment",
+      "notificationEnabled": true
+    }
+  ],
+  "settings": {
+    "notificationDays": 7,
+    "enableNotifications": true
+  },
+  "categories": [
+    {
+      "id": "entertainment",
+      "name": "Entertainment",
+      "color": "#9333ea",
+      "emoji": "🎮",
+      "isCustom": false
+    },
+    {
+      "id": "custom-cat",
+      "name": "Custom Category",
+      "color": "#ff6b6b",
+      "emoji": "🎯",
+      "isCustom": true
+    }
+  ],
+  "exportDate": "2025-06-21T09:20:34.909Z"
+}
