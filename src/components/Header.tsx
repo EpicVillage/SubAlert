@@ -16,7 +16,11 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
     <header className="header">
       <div className="header-content">
         <div className="header-brand">
-          <img src="/subalert-logo.png" alt="SubAlert Logo" className="header-logo" />
+          <img 
+            src={theme === 'dark' ? "/subalert-logo-light.png" : "/subalert-logo.png"} 
+            alt="SubAlert Logo" 
+            className="header-logo" 
+          />
           <h1>SubAlert</h1>
         </div>
         <div className="header-actions">

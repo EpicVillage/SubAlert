@@ -10,7 +10,7 @@ const Stats: React.FC<StatsProps> = ({ totalApis, expiringSoon, monthlyCost }) =
   return (
     <div className="stats">
       <div className="stat-card">
-        <h3>Total APIs</h3>
+        <h3>Total Subscriptions</h3>
         <p className="stat-value">{totalApis}</p>
       </div>
       <div className="stat-card">
