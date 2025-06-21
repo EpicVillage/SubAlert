@@ -96,6 +96,15 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
     if (success) {
       setMasterPasswordEnabled(true);
       showNotification('success', 'Security', 'Master password enabled');
+      
+      // Prompt to enable biometric if available
+      if (biometricAvailable && !biometricEnabled) {
+        setTimeout(() => {
+          if (window.confirm('Would you like to enable biometric authentication for easier unlocking?')) {
+            handleBiometricToggle();
+          }
+        }, 500);
+      }
     } else {
       showNotification('error', 'Security Error', 'Failed to setup master password');
     }

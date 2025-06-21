@@ -920,6 +920,47 @@ form {
 .biometric-lock-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.biometric-lock-icon.fingerprint-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
+  background: var(--primary-light);
+  border-radius: 50%;
+  color: var(--primary);
+}
+
+.biometric-lock-icon.fingerprint-icon:hover {
+  transform: scale(1.1);
+  background: var(--primary);
+  color: white;
+}
+
+.biometric-lock-icon.fingerprint-icon:active {
+  transform: scale(0.95);
+}
+
+.authenticating-text {
+  color: var(--primary);
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  font-weight: 500;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .biometric-lock-container h2 {

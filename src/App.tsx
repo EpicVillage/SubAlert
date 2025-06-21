@@ -63,6 +63,9 @@ function App() {
       if (biometric.isEnabled() && !isLocked) {
         biometric.updateLastAuth();
       }
+      if (masterPassword.isEnabled() && !isMasterPasswordLocked) {
+        masterPassword.updateLastActivity();
+      }
     };
     
     // Listen for AI settings event from Settings modal
@@ -82,6 +85,9 @@ function App() {
       if (biometric.needsAuthentication() && !isLocked) {
         setIsLocked(true);
       }
+      if (masterPassword.needsUnlock() && !isMasterPasswordLocked) {
+        setIsMasterPasswordLocked(true);
+      }
     }, 60000);
     
     return () => {
@@ -91,7 +97,7 @@ function App() {
       });
       clearInterval(inactivityCheck);
     };
-  }, [isLocked]);
+  }, [isLocked, isMasterPasswordLocked]);
 
   useEffect(() => {
     storage.saveAPIs(apis);
@@ -163,12 +169,15 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {isLocked && (
-          <BiometricLock onAuthenticated={() => setIsLocked(false)} />
-        )}
-        
-        {isMasterPasswordLocked && (
-          <MasterPasswordLock onUnlocked={() => setIsMasterPasswordLocked(false)} />
+        {(isLocked || isMasterPasswordLocked) && (
+          isMasterPasswordLocked ? (
+            <MasterPasswordLock onUnlocked={() => {
+              setIsMasterPasswordLocked(false);
+              setIsLocked(false);
+            }} />
+          ) : (
+            <BiometricLock onAuthenticated={() => setIsLocked(false)} />
+          )
         )}
         
         <Header 
