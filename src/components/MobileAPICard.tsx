@@ -18,10 +18,18 @@ const MobileAPICard: React.FC<MobileAPICardProps> = ({ api, categories, onEdit, 
 
   const swipeHandlers = useSwipe({
     onSwipeLeft: () => {
-      setSwipeOffset(-100);
+      if (swipeOffset === 0) {
+        setSwipeOffset(-100);
+      } else if (swipeOffset > 0) {
+        setSwipeOffset(0);
+      }
     },
     onSwipeRight: () => {
-      setSwipeOffset(100);
+      if (swipeOffset === 0) {
+        setSwipeOffset(100);
+      } else if (swipeOffset < 0) {
+        setSwipeOffset(0);
+      }
     },
     threshold: 30,
   });

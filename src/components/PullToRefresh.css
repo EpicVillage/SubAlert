@@ -1,6 +1,6 @@
 .pull-to-refresh-container {
   position: relative;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

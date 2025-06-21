@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import APIModal from './components/APIModal';
 import SettingsModal from './components/SettingsModal';
+import MobileSettingsModal from './components/MobileSettingsModal';
 import CategoryManager from './components/CategoryManager';
 import ConfirmModal from './components/ConfirmModal';
 import BiometricLock from './components/BiometricLock';
@@ -206,11 +207,19 @@ function App() {
         )}
         
         {showSettingsModal && (
-          <SettingsModal
-            settings={settings}
-            onSave={handleSaveSettings}
-            onClose={() => setShowSettingsModal(false)}
-          />
+          isTouchDevice ? (
+            <MobileSettingsModal
+              settings={settings}
+              onSave={handleSaveSettings}
+              onClose={() => setShowSettingsModal(false)}
+            />
+          ) : (
+            <SettingsModal
+              settings={settings}
+              onSave={handleSaveSettings}
+              onClose={() => setShowSettingsModal(false)}
+            />
+          )
         )}
         
         {showCategoryManager && (

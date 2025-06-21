@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIsTouchDevice } from '../hooks/useTouch';
 
 interface HeaderProps {
   onAddAPI: () => void;
@@ -12,6 +13,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories, onOpenAI }) => {
+  const isTouchDevice = useIsTouchDevice();
   return (
     <header className="header">
       <div className="header-content">
@@ -27,12 +29,14 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
           <button className="btn btn-primary" onClick={onAddAPI}>
             + Add
           </button>
-          <button 
-            className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
-            onClick={onToggleEditMode}
-          >
-            {isEditMode ? '✓ Done' : '✏️ Edit'}
-          </button>
+          {!isTouchDevice && (
+            <button 
+              className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
+              onClick={onToggleEditMode}
+            >
+              {isEditMode ? '✓ Done' : '✏️ Edit'}
+            </button>
+          )}
           <button className="btn btn-secondary" onClick={onOpenCategories}>
             🏷️ Categories
           </button>
