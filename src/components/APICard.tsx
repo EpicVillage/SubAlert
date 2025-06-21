@@ -50,18 +50,18 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
   return (
     <>
     <div className={`api-card ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''} ${isSelected ? 'selected' : ''}`}>
-      {isEditMode && (
-        <div className="api-card-checkbox">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={onToggleSelect}
-            className="selection-checkbox"
-          />
-        </div>
-      )}
       <div className="api-card-header">
-        <h3>{api.serviceName}</h3>
+        <div className="api-card-header-left">
+          {isEditMode && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={onToggleSelect}
+              className="selection-checkbox"
+            />
+          )}
+          <h3>{api.serviceName}</h3>
+        </div>
         <span 
           className="category-badge" 
           style={{ backgroundColor: category.color }}

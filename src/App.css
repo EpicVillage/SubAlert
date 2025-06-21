@@ -395,18 +395,45 @@ body {
   background: linear-gradient(to bottom, rgba(37, 99, 235, 0.05), var(--bg-primary));
 }
 
-.api-card-checkbox {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 10;
+.api-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .selection-checkbox {
+  appearance: none;
   width: 20px;
   height: 20px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
   cursor: pointer;
-  accent-color: var(--primary);
+  transition: all 0.15s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.selection-checkbox:hover {
+  border-color: var(--primary);
+}
+
+.selection-checkbox:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.selection-checkbox:checked::after {
+  content: '';
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  position: absolute;
 }
 
 .api-card-header {

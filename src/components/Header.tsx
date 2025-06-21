@@ -37,11 +37,11 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
                 className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
                 onClick={onToggleEditMode}
               >
-                {isEditMode ? (selectedCount > 0 ? `${selectedCount} selected` : '✓ Done') : '✏️ Edit'}
+                {isEditMode ? '✓ Done' : '✏️ Edit'}
               </button>
               {isEditMode && onSelectAll && (
                 <button className="btn btn-link" onClick={onSelectAll}>
-                  Select All
+                  {selectedCount > 0 ? 'Deselect All' : 'Select All'}
                 </button>
               )}
             </>

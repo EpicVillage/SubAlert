@@ -38,6 +38,7 @@ function App() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const [isMasterPasswordLocked, setIsMasterPasswordLocked] = useState(false);
   const [showAIModal, setShowAIModal] = useState<'menu' | 'settings' | 'recommendations' | null>(null);
@@ -190,12 +191,13 @@ function App() {
   // Bulk operation handlers
   const handleBulkDelete = () => {
     if (selectedIds.size === 0) return;
-    
-    const confirmMessage = `Are you sure you want to delete ${selectedIds.size} subscription${selectedIds.size > 1 ? 's' : ''}?`;
-    if (window.confirm(confirmMessage)) {
-      setApis(apis.filter(api => !selectedIds.has(api.id)));
-      setSelectedIds(new Set());
-    }
+    setBulkDeleteConfirm(true);
+  };
+
+  const confirmBulkDelete = () => {
+    setApis(apis.filter(api => !selectedIds.has(api.id)));
+    setSelectedIds(new Set());
+    setBulkDeleteConfirm(false);
   };
 
   const handleBulkCategoryChange = (categoryId: string) => {
@@ -323,6 +325,18 @@ function App() {
             type="danger"
             onConfirm={confirmDelete}
             onCancel={() => setDeleteConfirm({ show: false, id: null })}
+          />
+        )}
+        
+        {bulkDeleteConfirm && (
+          <ConfirmModal
+            title="Delete Selected Subscriptions"
+            message={`Are you sure you want to delete ${selectedIds.size} subscription${selectedIds.size > 1 ? 's' : ''}? This action cannot be undone.`}
+            confirmText="Delete All"
+            cancelText="Cancel"
+            type="danger"
+            onConfirm={confirmBulkDelete}
+            onCancel={() => setBulkDeleteConfirm(false)}
           />
         )}
         
