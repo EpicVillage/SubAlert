@@ -10,9 +10,11 @@ interface HeaderProps {
   onToggleEditMode: () => void;
   onOpenCategories: () => void;
   onOpenAI: () => void;
+  selectedCount?: number;
+  onSelectAll?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories, onOpenAI }) => {
+const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories, onOpenAI, selectedCount = 0, onSelectAll }) => {
   const isTouchDevice = useIsTouchDevice();
   return (
     <header className="header">
@@ -30,12 +32,19 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
             + Add
           </button>
           {!isTouchDevice && (
-            <button 
-              className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
-              onClick={onToggleEditMode}
-            >
-              {isEditMode ? '✓ Done' : '✏️ Edit'}
-            </button>
+            <>
+              <button 
+                className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
+                onClick={onToggleEditMode}
+              >
+                {isEditMode ? (selectedCount > 0 ? `${selectedCount} selected` : '✓ Done') : '✏️ Edit'}
+              </button>
+              {isEditMode && onSelectAll && (
+                <button className="btn btn-link" onClick={onSelectAll}>
+                  Select All
+                </button>
+              )}
+            </>
           )}
           <button className="btn btn-secondary" onClick={onOpenCategories}>
             🏷️ Categories

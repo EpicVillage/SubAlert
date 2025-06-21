@@ -15,9 +15,11 @@ interface DashboardProps {
   onUpdateAPI?: (api: API) => void;
   isEditMode?: boolean;
   isMobile?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false, isMobile = false }) => {
+const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false, isMobile = false, selectedIds = new Set(), onToggleSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'expiring' | 'paid' | 'free'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'category'>('grid');
@@ -151,6 +153,8 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
                 onEdit={() => onEditAPI(api)}
                 onDelete={() => onDeleteAPI(api.id)}
                 isEditMode={isEditMode}
+                isSelected={selectedIds.has(api.id)}
+                onToggleSelect={() => onToggleSelect?.(api.id)}
               />
             ) : (
               <APICard
@@ -160,6 +164,8 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
                 onEdit={() => onEditAPI(api)}
                 onDelete={() => onDeleteAPI(api.id)}
                 isEditMode={isEditMode}
+                isSelected={selectedIds.has(api.id)}
+                onToggleSelect={() => onToggleSelect?.(api.id)}
               />
             )
           ))}
@@ -181,6 +187,8 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
           onDeleteAPI={onDeleteAPI}
           onUpdateAPI={onUpdateAPI || ((updatedAPI) => onEditAPI(updatedAPI))}
           isEditMode={isEditMode}
+          selectedIds={selectedIds}
+          onToggleSelect={onToggleSelect}
         />
       )}
       

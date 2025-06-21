@@ -1,0 +1,120 @@
+.bulk-actions-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.bulk-actions-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.selected-count {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bulk-actions-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.category-dropdown {
+  position: relative;
+}
+
+.category-dropdown-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
+}
+
+.category-option {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.category-option:hover {
+  background: var(--bg-tertiary);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .bulk-actions-toolbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.75rem;
+  }
+  
+  .bulk-actions-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .bulk-actions-buttons {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .bulk-actions-buttons .btn {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .category-dropdown-menu {
+    position: fixed;
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+  }
+}

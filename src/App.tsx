@@ -12,6 +12,7 @@ import { AISettings } from './components/AISettings';
 import { AIRecommendations } from './components/AIRecommendations';
 import { AIMenu } from './components/AIMenu';
 import PullToRefresh from './components/PullToRefresh';
+import BulkActionsToolbar from './components/BulkActionsToolbar';
 import { API, Settings, Category } from './types';
 import { storage } from './utils/storage';
 import { setupNotificationScheduler } from './utils/notificationScheduler';
@@ -35,6 +36,7 @@ function App() {
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [editingAPI, setEditingAPI] = useState<API | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
   const { theme, toggleTheme } = useTheme();
   const [isMasterPasswordLocked, setIsMasterPasswordLocked] = useState(false);
@@ -154,6 +156,74 @@ function App() {
     await new Promise(resolve => setTimeout(resolve, 800));
   }, []);
 
+  // Selection handlers
+  const handleToggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === apis.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(apis.map(api => api.id)));
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const handleToggleEditMode = () => {
+    setIsEditMode(!isEditMode);
+    if (isEditMode) {
+      // Clear selection when exiting edit mode
+      setSelectedIds(new Set());
+    }
+  };
+
+  // Bulk operation handlers
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) return;
+    
+    const confirmMessage = `Are you sure you want to delete ${selectedIds.size} subscription${selectedIds.size > 1 ? 's' : ''}?`;
+    if (window.confirm(confirmMessage)) {
+      setApis(apis.filter(api => !selectedIds.has(api.id)));
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleBulkCategoryChange = (categoryId: string) => {
+    if (selectedIds.size === 0) return;
+    
+    setApis(apis.map(api => 
+      selectedIds.has(api.id) ? { ...api, category: categoryId } : api
+    ));
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkExport = () => {
+    if (selectedIds.size === 0) return;
+    
+    const selectedApis = apis.filter(api => selectedIds.has(api.id));
+    const dataStr = JSON.stringify(selectedApis, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `subalert-export-${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    setSelectedIds(new Set());
+  };
+
   return (
     <Router>
       <div className="App">
@@ -173,9 +243,11 @@ function App() {
           theme={theme}
           onToggleTheme={toggleTheme}
           isEditMode={isEditMode}
-          onToggleEditMode={() => setIsEditMode(!isEditMode)}
+          onToggleEditMode={handleToggleEditMode}
           onOpenCategories={() => setShowCategoryManager(true)}
           onOpenAI={() => setShowAIModal('menu')}
+          selectedCount={selectedIds.size}
+          onSelectAll={handleSelectAll}
         />
         <Routes>
           <Route path="/" element={
@@ -189,6 +261,8 @@ function App() {
                   onUpdateAPI={handleUpdateAPI}
                   isEditMode={isEditMode}
                   isMobile={true}
+                  selectedIds={selectedIds}
+                  onToggleSelect={handleToggleSelect}
                 />
               </PullToRefresh>
             ) : (
@@ -200,6 +274,8 @@ function App() {
                 onUpdateAPI={handleUpdateAPI}
                 isEditMode={isEditMode}
                 isMobile={false}
+                selectedIds={selectedIds}
+                onToggleSelect={handleToggleSelect}
               />
             )
           } />
@@ -272,6 +348,17 @@ function App() {
           <AIRecommendations
             apis={apis}
             onClose={() => setShowAIModal(null)}
+          />
+        )}
+        
+        {isEditMode && selectedIds.size > 0 && (
+          <BulkActionsToolbar
+            selectedCount={selectedIds.size}
+            categories={categories}
+            onDelete={handleBulkDelete}
+            onCategoryChange={handleBulkCategoryChange}
+            onExport={handleBulkExport}
+            onClearSelection={handleClearSelection}
           />
         )}
       </div>

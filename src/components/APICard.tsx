@@ -11,9 +11,11 @@ interface APICardProps {
   onEdit: () => void;
   onDelete: () => void;
   isEditMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }
 
-const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, isEditMode = false }) => {
+const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, isEditMode = false, isSelected = false, onToggleSelect }) => {
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
@@ -47,7 +49,17 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
 
   return (
     <>
-    <div className={`api-card ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}>
+    <div className={`api-card ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''} ${isSelected ? 'selected' : ''}`}>
+      {isEditMode && (
+        <div className="api-card-checkbox">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={onToggleSelect}
+            className="selection-checkbox"
+          />
+        </div>
+      )}
       <div className="api-card-header">
         <h3>{api.serviceName}</h3>
         <span 

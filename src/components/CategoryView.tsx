@@ -9,6 +9,8 @@ interface CategoryViewProps {
   onDeleteAPI: (id: string) => void;
   onUpdateAPI: (api: API) => void;
   isEditMode?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
 interface CategorySection {
@@ -19,7 +21,7 @@ interface CategorySection {
   emoji: string;
 }
 
-const CategoryView: React.FC<CategoryViewProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false }) => {
+const CategoryView: React.FC<CategoryViewProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false, selectedIds = new Set(), onToggleSelect }) => {
   const [draggedItem, setDraggedItem] = useState<API | null>(null);
   const [dragOverCategory, setDragOverCategory] = useState<string | null>(null);
 
@@ -108,6 +110,8 @@ const CategoryView: React.FC<CategoryViewProps> = ({ apis, categories, onEditAPI
                   onEdit={() => onEditAPI(api)}
                   onDelete={() => onDeleteAPI(api.id)}
                   isEditMode={isEditMode}
+                  isSelected={selectedIds.has(api.id)}
+                  onToggleSelect={() => onToggleSelect?.(api.id)}
                 />
               </div>
             ))}

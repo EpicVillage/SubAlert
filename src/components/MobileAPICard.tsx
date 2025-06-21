@@ -10,9 +10,11 @@ interface MobileAPICardProps {
   onEdit: () => void;
   onDelete: () => void;
   isEditMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }
 
-const MobileAPICard: React.FC<MobileAPICardProps> = ({ api, categories, onEdit, onDelete, isEditMode }) => {
+const MobileAPICard: React.FC<MobileAPICardProps> = ({ api, categories, onEdit, onDelete, isEditMode, isSelected = false, onToggleSelect }) => {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -76,7 +78,9 @@ const MobileAPICard: React.FC<MobileAPICardProps> = ({ api, categories, onEdit, 
           categories={categories} 
           onEdit={onEdit} 
           onDelete={onDelete} 
-          isEditMode={false}
+          isEditMode={isEditMode}
+          isSelected={isSelected}
+          onToggleSelect={onToggleSelect}
         />
       </div>
     </div>
