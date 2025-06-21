@@ -147,19 +147,18 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
             <p className="api-notes">{api.notes}</p>
           </div>
         )}
-
-        {api.subscriptionType === 'paid' && (
-          <div className="api-field">
-            <button 
-              className="btn btn-secondary compare-btn"
-              onClick={() => setShowComparison(true)}
-              style={{ marginTop: '0.5rem' }}
-            >
-              Compare Alternatives
-            </button>
-          </div>
-        )}
       </div>
+
+      {api.subscriptionType === 'paid' && (
+        <div style={{ padding: '0 1.25rem 1.25rem', marginTop: 'auto' }}>
+          <button 
+            className="btn btn-secondary compare-btn"
+            onClick={() => setShowComparison(true)}
+          >
+            Compare Alternatives
+          </button>
+        </div>
+      )}
 
       {isEditMode && (
         <div className="api-card-actions-modern">

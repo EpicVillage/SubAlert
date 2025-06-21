@@ -337,6 +337,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1rem;
+  align-items: stretch;
 }
 
 /* API Card */
@@ -347,6 +348,9 @@ body {
   transition: all 0.15s ease;
   border: 1px solid var(--border-color);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .api-card:hover {
@@ -393,6 +397,9 @@ body {
 
 .api-card-content {
   padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .api-field {
