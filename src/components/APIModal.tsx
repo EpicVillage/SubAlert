@@ -12,6 +12,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
   const [formData, setFormData] = useState({
     serviceName: '',
     serviceDescription: '',
+    website: '',
     apiKey: '',
     email: '',
     subscriptionType: 'free' as 'free' | 'paid',
@@ -31,6 +32,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
       setFormData({
         serviceName: api.serviceName,
         serviceDescription: api.serviceDescription || '',
+        website: api.website || '',
         apiKey: api.apiKey,
         email: api.email,
         subscriptionType: api.subscriptionType,
@@ -92,6 +94,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
       id: api?.id || Date.now().toString(),
       serviceName: formData.serviceName,
       serviceDescription: formData.serviceDescription || undefined,
+      website: formData.website || undefined,
       apiKey: formData.apiKey,
       email: formData.email,
       subscriptionType: formData.subscriptionType,
@@ -141,6 +144,17 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
               value={formData.serviceDescription}
               onChange={(e) => setFormData({ ...formData, serviceDescription: e.target.value })}
               placeholder="e.g., AI language model API for text generation, chatbots, and content creation"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="website">Website</label>
+            <input
+              type="url"
+              id="website"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              placeholder="https://example.com"
             />
           </div>
 

@@ -85,46 +85,53 @@ Be specific with service names and avoid generic advice.`
     const messages = [
       {
         role: 'system',
-        content: `You are a feature comparison expert. Analyze the given service and provide detailed comparisons with 2-3 alternatives. Return a JSON response in this exact format:
+        content: `You are a feature comparison expert. Analyze the given service and provide detailed comparisons with 2-3 alternatives. Return ONLY valid JSON without any markdown formatting or code blocks.
+
+The response must be a valid JSON object with this exact structure:
 {
   "currentService": {
-    "name": "Service Name",
-    "features": ["feature1", "feature2", "feature3"],
-    "cost": number,
-    "billingCycle": "monthly|yearly"
+    "name": "string",
+    "features": ["string", "string", "string"],
+    "cost": 0,
+    "billingCycle": "monthly"
   },
   "alternatives": [
     {
-      "name": "Alternative Service Name",
-      "cost": number,
-      "billingCycle": "monthly|yearly",
+      "name": "string",
+      "cost": 0,
+      "billingCycle": "monthly",
       "features": [
         {
-          "name": "Feature name",
-          "current": true|false|"value",
-          "alternative": true|false|"value",
-          "importance": "high|medium|low"
+          "name": "string",
+          "current": true,
+          "alternative": true,
+          "importance": "high"
         }
       ],
-      "pros": ["Pro 1", "Pro 2"],
-      "cons": ["Con 1", "Con 2"],
-      "savings": percentage_saved,
-      "recommendation": "Brief recommendation explaining when this alternative makes sense"
+      "pros": ["string", "string"],
+      "cons": ["string", "string"],
+      "savings": 0,
+      "recommendation": "string"
     }
   ]
 }
 
-Important:
-- Include specific feature comparisons (at least 5-8 features)
-- Calculate actual savings percentage
-- Be specific about what features are gained or lost
-- Consider the service description when finding alternatives`
+Rules:
+- Use actual boolean values (true/false) not strings for current/alternative
+- Use actual numbers for cost and savings, not strings
+- billingCycle must be exactly "monthly" or "yearly"
+- importance must be exactly "high", "medium", or "low"
+- Include 5-8 specific features for comparison
+- Calculate real savings percentage as a number
+- Do NOT include any text before or after the JSON
+- Do NOT wrap the JSON in markdown code blocks`
       },
       {
         role: 'user',
         content: `Compare this service with alternatives:
 Name: ${api.serviceName}
 Description: ${api.serviceDescription || 'No description provided'}
+Website: ${api.website || 'No website provided'}
 Cost: $${api.cost || 0}/${api.billingCycle || 'monthly'}
 Category: ${api.category}
 Type: ${api.subscriptionType}`
@@ -156,14 +163,30 @@ Type: ${api.subscriptionType}`
     
     // Parse the JSON response
     try {
-      return JSON.parse(content);
+      // First, try to clean the content
+      let cleanContent = content.trim();
+      
+      // Remove any markdown code blocks
+      cleanContent = cleanContent.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+      
+      // Remove any leading/trailing whitespace
+      cleanContent = cleanContent.trim();
+      
+      // Try to parse
+      return JSON.parse(cleanContent);
     } catch (e) {
       // If parsing fails, try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch (e2) {
+          console.error('Failed to parse extracted JSON:', jsonMatch[0]);
+          throw new Error(`JSON parsing failed: ${e2 instanceof Error ? e2.message : String(e2)}`);
+        }
       }
-      throw new Error('Failed to parse AI response');
+      console.error('Failed to parse AI response:', content);
+      throw new Error(`Failed to parse AI response: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 };
@@ -219,31 +242,33 @@ const anthropicProvider: AIProvider = {
     const messages = [
       {
         role: 'user',
-        content: `As a feature comparison expert, analyze this service and provide detailed comparisons with 2-3 alternatives. Return ONLY a JSON response in this exact format:
+        content: `As a feature comparison expert, analyze this service and provide detailed comparisons with 2-3 alternatives. Return ONLY valid JSON without any markdown formatting or explanatory text.
+
+The response must be exactly this structure with real values:
 {
   "currentService": {
-    "name": "Service Name",
-    "features": ["feature1", "feature2", "feature3"],
-    "cost": number,
-    "billingCycle": "monthly|yearly"
+    "name": "string",
+    "features": ["string array"],
+    "cost": 0,
+    "billingCycle": "monthly"
   },
   "alternatives": [
     {
-      "name": "Alternative Service Name",
-      "cost": number,
-      "billingCycle": "monthly|yearly",
+      "name": "string",
+      "cost": 0,
+      "billingCycle": "monthly",
       "features": [
         {
-          "name": "Feature name",
-          "current": true|false|"value",
-          "alternative": true|false|"value",
-          "importance": "high|medium|low"
+          "name": "string",
+          "current": true,
+          "alternative": true,
+          "importance": "high"
         }
       ],
-      "pros": ["Pro 1", "Pro 2"],
-      "cons": ["Con 1", "Con 2"],
-      "savings": percentage_saved,
-      "recommendation": "Brief recommendation explaining when this alternative makes sense"
+      "pros": ["string array"],
+      "cons": ["string array"],
+      "savings": 0,
+      "recommendation": "string"
     }
   ]
 }
@@ -251,6 +276,7 @@ const anthropicProvider: AIProvider = {
 Service to analyze:
 Name: ${api.serviceName}
 Description: ${api.serviceDescription || 'No description provided'}
+Website: ${api.website || 'No website provided'}
 Cost: $${api.cost || 0}/${api.billingCycle || 'monthly'}
 Category: ${api.category}
 Type: ${api.subscriptionType}`
@@ -285,14 +311,30 @@ Type: ${api.subscriptionType}`
     
     // Parse the JSON response
     try {
-      return JSON.parse(content);
+      // First, try to clean the content
+      let cleanContent = content.trim();
+      
+      // Remove any markdown code blocks
+      cleanContent = cleanContent.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+      
+      // Remove any leading/trailing whitespace
+      cleanContent = cleanContent.trim();
+      
+      // Try to parse
+      return JSON.parse(cleanContent);
     } catch (e) {
       // If parsing fails, try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch (e2) {
+          console.error('Failed to parse extracted JSON:', jsonMatch[0]);
+          throw new Error(`JSON parsing failed: ${e2 instanceof Error ? e2.message : String(e2)}`);
+        }
       }
-      throw new Error('Failed to parse AI response');
+      console.error('Failed to parse AI response:', content);
+      throw new Error(`Failed to parse AI response: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 };

@@ -64,9 +64,24 @@ const FeatureComparison: React.FC<FeatureComparisonProps> = ({ api, onClose }) =
 
       // Get detailed comparison from AI
       const result = await provider.getFeatureComparison(apiKey, api);
+      
+      // Validate the result structure
+      if (!result || !result.currentService || !result.alternatives) {
+        throw new Error('Invalid comparison data received from AI');
+      }
+      
       setComparison(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate comparison');
+      console.error('Feature comparison error:', err);
+      if (err instanceof Error) {
+        if (err.message.includes('JSON')) {
+          setError('Failed to parse AI response. Please try again.');
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError('Failed to generate comparison');
+      }
     } finally {
       setLoading(false);
     }
@@ -116,8 +131,20 @@ const FeatureComparison: React.FC<FeatureComparisonProps> = ({ api, onClose }) =
           )}
 
           {error && (
-            <div className="error-message">
-              {error}
+            <div className="error-container">
+              <div className="error-message">
+                {error}
+              </div>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => {
+                  setError(null);
+                  generateComparison();
+                }}
+                style={{ marginTop: '1rem' }}
+              >
+                Try Again
+              </button>
             </div>
           )}
 

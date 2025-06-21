@@ -10,6 +10,7 @@ export interface API {
   id: string;
   serviceName: string;
   serviceDescription?: string; // What does this service do?
+  website?: string; // Service website URL
   apiKey: string;
   email: string;
   subscriptionType: 'free' | 'paid';

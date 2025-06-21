@@ -238,6 +238,20 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.error-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 768px) {
   .feature-comparison-modal {
     width: 95%;
