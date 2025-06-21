@@ -29,6 +29,7 @@ export class PDFReportGenerator {
   private textColor: string = '#111111';
   private lightGray: string = '#f5f5f5';
   private darkGray: string = '#666666';
+  private logoBase64: string = '';
 
   constructor(options: PDFReportOptions) {
     this.pdf = new jsPDF({
@@ -106,6 +107,9 @@ export class PDFReportGenerator {
   }
 
   private addHeader(options: PDFReportOptions) {
+    // Add watermark to first page
+    this.addWatermarkToPage(1);
+    
     // Add logo placeholder
     this.pdf.setFillColor(this.primaryColor);
     this.pdf.circle(this.margin + 10, this.currentY + 10, 10, 'F');
@@ -125,11 +129,12 @@ export class PDFReportGenerator {
     // Add date
     this.pdf.setFontSize(10);
     this.pdf.setTextColor(this.darkGray);
+    const dateText = `Generated on ${format(new Date(), 'MMMM dd, yyyy')}`;
+    const textWidth = this.pdf.getTextWidth(dateText);
     this.pdf.text(
-      `Generated on ${format(new Date(), 'MMMM dd, yyyy')}`,
-      this.pageWidth - this.margin - 50,
-      this.currentY + 8,
-      { align: 'right' }
+      dateText,
+      this.pageWidth - this.margin - textWidth,
+      this.currentY + 8
     );
     
     this.currentY += 30;
@@ -158,6 +163,15 @@ export class PDFReportGenerator {
   private async generateDetailedReport(apis: API[], categories: Category[], options: PDFReportOptions) {
     // Add summary statistics
     this.addSummaryStatistics(apis, categories);
+    
+    // Start detailed subscriptions on a new page
+    this.addNewPage();
+    
+    // Add section title for subscriptions
+    this.pdf.setFontSize(16);
+    this.pdf.setTextColor(this.textColor);
+    this.pdf.text('Detailed Subscriptions', this.margin, this.currentY);
+    this.currentY += 15;
     
     // Add detailed subscription information
     apis.forEach((api, index) => {
@@ -325,7 +339,7 @@ export class PDFReportGenerator {
       : ['Service', 'Category', 'Email', 'Cost', 'Billing', 'Next Renewal'];
     
     const colWidths = summary
-      ? [60, 40, 40, 50]
+      ? [70, 50, 35, 35]  // Adjusted widths to prevent overlap
       : [40, 30, 50, 30, 30, 40];
     
     let xPos = this.margin;
@@ -353,7 +367,7 @@ export class PDFReportGenerator {
         this.pdf.text(this.truncateText(api.serviceName, 25), xPos, this.currentY);
         xPos += colWidths[0];
         
-        this.pdf.text(category ? `${category.emoji} ${category.name}` : 'Other', xPos, this.currentY);
+        this.pdf.text(category ? category.name : 'Other', xPos, this.currentY);
         xPos += colWidths[1];
         
         if (api.subscriptionType === 'paid' && api.cost) {
@@ -489,6 +503,37 @@ export class PDFReportGenerator {
   private addNewPage() {
     this.pdf.addPage();
     this.currentY = 20;
+    // Add watermark to the new page immediately
+    const currentPage = this.pdf.internal.getNumberOfPages();
+    this.addWatermarkToPage(currentPage);
+  }
+
+  private addWatermarkToPage(pageNumber: number) {
+    // Save current position
+    const savedY = this.currentY;
+    const currentPage = this.pdf.internal.getCurrentPageInfo().pageNumber;
+    
+    // Add text watermark
+    this.pdf.setPage(pageNumber);
+    this.pdf.setFontSize(72);
+    this.pdf.setTextColor(245, 245, 245); // Very light gray
+    
+    // Calculate center position
+    const text = 'SubAlert';
+    const textWidth = this.pdf.getTextWidth(text);
+    const x = (this.pageWidth - textWidth) / 2;
+    const y = this.pageHeight / 2;
+    
+    // Add watermark text
+    this.pdf.text(text, x, y);
+    
+    // Reset to default text settings
+    this.pdf.setFontSize(10);
+    this.pdf.setTextColor(this.textColor);
+    
+    // Restore page and position
+    this.pdf.setPage(currentPage);
+    this.currentY = savedY;
   }
 
   private addFooterToAllPages() {
@@ -497,14 +542,18 @@ export class PDFReportGenerator {
     for (let i = 1; i <= pageCount; i++) {
       this.pdf.setPage(i);
       
+      // Add watermark to each page
+      this.addWatermarkToPage(i);
+      
       // Add page number
       this.pdf.setFontSize(9);
       this.pdf.setTextColor(this.darkGray);
+      const pageText = `Page ${i} of ${pageCount}`;
+      const pageTextWidth = this.pdf.getTextWidth(pageText);
       this.pdf.text(
-        `Page ${i} of ${pageCount}`,
-        this.pageWidth / 2,
-        this.pageHeight - 10,
-        { align: 'center' }
+        pageText,
+        (this.pageWidth - pageTextWidth) / 2,
+        this.pageHeight - 10
       );
       
       // Add footer text
@@ -529,7 +578,9 @@ export class PDFReportGenerator {
     if (category) {
       this.pdf.setFontSize(9);
       this.pdf.setTextColor(category.color);
-      this.pdf.text(`${category.emoji} ${category.name}`, this.pageWidth - this.margin - 30, this.currentY, { align: 'right' });
+      const categoryText = category.name;
+      const categoryTextWidth = this.pdf.getTextWidth(categoryText);
+      this.pdf.text(categoryText, this.pageWidth - this.margin - categoryTextWidth, this.currentY);
     }
     
     this.currentY += 8;
@@ -639,10 +690,12 @@ export class PDFReportGenerator {
       // Category header
       this.pdf.setFontSize(11);
       this.pdf.setTextColor(category.color);
-      this.pdf.text(`${category.emoji} ${category.name}`, this.margin, this.currentY);
+      this.pdf.text(category.name, this.margin, this.currentY);
       
       this.pdf.setTextColor(this.textColor);
-      this.pdf.text(`$${monthlyCost.toFixed(2)}/month`, this.pageWidth - this.margin - 30, this.currentY, { align: 'right' });
+      const costText = `$${monthlyCost.toFixed(2)}/month`;
+      const costTextWidth = this.pdf.getTextWidth(costText);
+      this.pdf.text(costText, this.pageWidth - this.margin - costTextWidth, this.currentY);
       
       this.currentY += 6;
       
@@ -653,7 +706,9 @@ export class PDFReportGenerator {
         if (api.subscriptionType === 'paid' && api.cost) {
           const monthly = api.billingCycle === 'yearly' ? api.cost / 12 : api.cost;
           this.pdf.text(`  • ${api.serviceName}`, this.margin + 5, this.currentY);
-          this.pdf.text(`$${monthly.toFixed(2)}/mo`, this.pageWidth - this.margin - 30, this.currentY, { align: 'right' });
+          const monthlyText = `$${monthly.toFixed(2)}/mo`;
+          const monthlyTextWidth = this.pdf.getTextWidth(monthlyText);
+          this.pdf.text(monthlyText, this.pageWidth - this.margin - monthlyTextWidth, this.currentY);
           this.currentY += 5;
         }
       });
@@ -770,12 +825,14 @@ export class PDFReportGenerator {
         this.pdf.text(`${format(new Date(api.expiryDate!), 'dd')} - ${api.serviceName}`, this.margin + 5, this.currentY);
         
         if (api.subscriptionType === 'paid' && api.cost) {
-          this.pdf.text(`$${api.cost}`, this.pageWidth - this.margin - 40, this.currentY, { align: 'right' });
+          const apiCostText = `$${api.cost}`;
+          const apiCostWidth = this.pdf.getTextWidth(apiCostText);
+          this.pdf.text(apiCostText, this.pageWidth - this.margin - apiCostWidth, this.currentY);
         }
         
         if (category) {
           this.pdf.setTextColor(category.color);
-          this.pdf.text(category.emoji, this.pageWidth - this.margin - 20, this.currentY, { align: 'right' });
+          // Skip emoji in PDF
         }
         
         this.currentY += 6;
@@ -819,7 +876,7 @@ export class PDFReportGenerator {
       // Category info
       this.pdf.setFontSize(12);
       this.pdf.setTextColor(category.color);
-      this.pdf.text(`${category.emoji} ${category.name}`, this.margin + 5, this.currentY + 10);
+      this.pdf.text(category.name, this.margin + 5, this.currentY + 10);
       
       this.pdf.setFontSize(10);
       this.pdf.setTextColor(this.textColor);
@@ -838,12 +895,14 @@ export class PDFReportGenerator {
     // Category header
     this.pdf.setFontSize(14);
     this.pdf.setTextColor(category.color);
-    this.pdf.text(`${category.emoji} ${category.name}`, this.margin, this.currentY);
+    this.pdf.text(category.name, this.margin, this.currentY);
     
     const stats = this.calculateStatistics(apis);
     this.pdf.setFontSize(10);
     this.pdf.setTextColor(this.darkGray);
-    this.pdf.text(`${apis.length} subscriptions • $${stats.monthlyCost.toFixed(2)}/month`, this.pageWidth - this.margin - 50, this.currentY, { align: 'right' });
+    const categoryStatsText = `${apis.length} subscriptions • $${stats.monthlyCost.toFixed(2)}/month`;
+    const categoryStatsWidth = this.pdf.getTextWidth(categoryStatsText);
+    this.pdf.text(categoryStatsText, this.pageWidth - this.margin - categoryStatsWidth, this.currentY);
     
     this.currentY += 10;
     
@@ -859,7 +918,9 @@ export class PDFReportGenerator {
       
       if (api.subscriptionType === 'paid' && api.cost) {
         const monthly = api.billingCycle === 'yearly' ? api.cost / 12 : api.cost;
-        this.pdf.text(`$${monthly.toFixed(2)}/mo`, this.pageWidth - this.margin - 30, this.currentY, { align: 'right' });
+        const costText = `$${monthly.toFixed(2)}/mo`;
+        const costTextWidth = this.pdf.getTextWidth(costText);
+        this.pdf.text(costText, this.pageWidth - this.margin - costTextWidth, this.currentY);
       }
       
       this.currentY += 5;
