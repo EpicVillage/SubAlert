@@ -215,8 +215,7 @@
 
 .mobile-settings-section input[type="text"],
 .mobile-settings-section input[type="password"],
-.mobile-settings-section input[type="number"],
-.mobile-settings-section .form-select {
+.mobile-settings-section input[type="number"] {
   width: 100%;
   padding: 0.75rem;
   background: var(--bg-secondary);
@@ -224,6 +223,24 @@
   border-radius: 8px;
   font-size: 1rem;
   color: var(--text-primary);
+}
+
+.mobile-settings-section .form-select {
+  width: 100%;
+  padding: 0.75rem;
+  padding-right: 2.5rem;
+  background: var(--bg-secondary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 .mobile-settings-section .input-with-button {

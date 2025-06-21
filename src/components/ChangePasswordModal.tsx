@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './PasswordModal.css';
 
 interface ChangePasswordModalProps {
   onConfirm: (currentPassword: string, newPassword: string) => void;

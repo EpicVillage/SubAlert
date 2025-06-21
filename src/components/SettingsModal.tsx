@@ -4,7 +4,9 @@ import { telegram } from '../utils/telegram';
 import { storage } from '../utils/storage';
 import PasswordModal from './PasswordModal';
 import { biometric } from '../utils/biometric';
+import { masterPassword, LockTimeout } from '../utils/masterPassword';
 import { useNotification } from '../hooks/useNotification';
+import ChangePasswordModal from './ChangePasswordModal';
 
 interface SettingsModalProps {
   settings: Settings;
@@ -32,6 +34,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
   const [showImportPasswordModal, setShowImportPasswordModal] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [masterPasswordEnabled, setMasterPasswordEnabled] = useState(false);
+  const [lockTimeout, setLockTimeout] = useState<LockTimeout>('5min');
+  const [showMasterPasswordModal, setShowMasterPasswordModal] = useState<'setup' | 'disable' | 'change' | null>(null);
 
   useEffect(() => {
     setFormData(settings);
@@ -43,6 +48,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
       setBiometricAvailable(available);
       setBiometricEnabled(biometric.isEnabled());
     });
+    setMasterPasswordEnabled(masterPassword.isEnabled());
+    setLockTimeout(masterPassword.getLockTimeout());
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -171,6 +178,38 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
         showNotification('error', 'Biometric Failed', 'Failed to enable biometric authentication. Please try again.');
       }
     }
+  };
+
+  const handleMasterPasswordSetup = async (password: string) => {
+    const success = await masterPassword.setup(password);
+    if (success) {
+      setMasterPasswordEnabled(true);
+      showNotification('success', 'Security', 'Master password enabled');
+    } else {
+      showNotification('error', 'Security Error', 'Failed to setup master password');
+    }
+    setShowMasterPasswordModal(null);
+  };
+
+  const handleMasterPasswordDisable = async (password: string) => {
+    const success = await masterPassword.disable(password);
+    if (success) {
+      setMasterPasswordEnabled(false);
+      showNotification('success', 'Security', 'Master password disabled');
+    } else {
+      showNotification('error', 'Security Error', 'Incorrect password');
+    }
+    setShowMasterPasswordModal(null);
+  };
+
+  const handleMasterPasswordChange = async (currentPassword: string, newPassword: string) => {
+    const success = await masterPassword.change(currentPassword, newPassword);
+    if (success) {
+      showNotification('success', 'Security', 'Master password changed');
+    } else {
+      showNotification('error', 'Security Error', 'Incorrect current password');
+    }
+    setShowMasterPasswordModal(null);
   };
 
   return (
@@ -413,6 +452,60 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                         </p>
                       )}
                     </div>
+                    
+                    <div className="security-card">
+                      <h4>Master Password</h4>
+                      <p>Encrypt all your data with a master password for maximum security.</p>
+                      
+                      <label className="checkbox-label" style={{ marginTop: '1rem' }}>
+                        <input
+                          type="checkbox"
+                          checked={masterPasswordEnabled}
+                          onChange={() => {
+                            if (masterPasswordEnabled) {
+                              setShowMasterPasswordModal('disable');
+                            } else {
+                              setShowMasterPasswordModal('setup');
+                            }
+                          }}
+                        />
+                        Enable master password encryption
+                      </label>
+                      
+                      {masterPasswordEnabled && (
+                        <>
+                          <div className="form-group" style={{ marginTop: '1rem' }}>
+                            <label htmlFor="lockTimeout">Lock timeout</label>
+                            <select
+                              id="lockTimeout"
+                              value={lockTimeout}
+                              onChange={(e) => {
+                                const timeout = e.target.value as LockTimeout;
+                                setLockTimeout(timeout);
+                                masterPassword.setLockTimeout(timeout);
+                              }}
+                            >
+                              <option value="immediately">Immediately</option>
+                              <option value="1min">After 1 minute</option>
+                              <option value="5min">After 5 minutes</option>
+                              <option value="15min">After 15 minutes</option>
+                              <option value="30min">After 30 minutes</option>
+                              <option value="1hour">After 1 hour</option>
+                              <option value="never">Never</option>
+                            </select>
+                          </div>
+                          
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ marginTop: '1rem' }}
+                            onClick={() => setShowMasterPasswordModal('change')}
+                          >
+                            Change Master Password
+                          </button>
+                        </>
+                      )}
+                    </div>
 
                     <div className="security-info">
                       <h4>How it works</h4>
@@ -420,6 +513,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                         <li>SubAlert will lock after 5 minutes of inactivity</li>
                         <li>Use your device's biometric authentication to unlock</li>
                         <li>Your biometric data never leaves your device</li>
+                        <li>Master password encrypts all data with AES-256-GCM</li>
+                        <li>Password is never stored, only a secure hash</li>
                         <li>Works on mobile devices and supported browsers</li>
                       </ul>
                     </div>
@@ -501,6 +596,34 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
           onConfirm={handlePasswordImport}
           onCancel={() => setShowImportPasswordModal(false)}
           showConfirmPassword={false}
+        />
+      )}
+      
+      {showMasterPasswordModal === 'setup' && (
+        <PasswordModal
+          title="Setup Master Password"
+          description="Create a master password to encrypt all your data"
+          confirmButtonText="Setup"
+          showConfirmPassword={true}
+          onConfirm={handleMasterPasswordSetup}
+          onCancel={() => setShowMasterPasswordModal(null)}
+        />
+      )}
+      
+      {showMasterPasswordModal === 'disable' && (
+        <PasswordModal
+          title="Disable Master Password"
+          description="Enter your current master password to disable encryption"
+          confirmButtonText="Disable"
+          onConfirm={handleMasterPasswordDisable}
+          onCancel={() => setShowMasterPasswordModal(null)}
+        />
+      )}
+      
+      {showMasterPasswordModal === 'change' && (
+        <ChangePasswordModal
+          onConfirm={handleMasterPasswordChange}
+          onCancel={() => setShowMasterPasswordModal(null)}
         />
       )}
     </div>
