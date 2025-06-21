@@ -134,6 +134,7 @@ export const aiStorage = {
   
   saveSettings: (provider: string, apiKey: string) => {
     // Encrypt the API key for storage
+    // TODO: Implement stronger encryption for API keys
     const encrypted = btoa(apiKey); // Basic encoding, you might want stronger encryption
     localStorage.setItem('subalert_ai_settings', JSON.stringify({
       provider,
