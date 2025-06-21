@@ -1,6 +1,7 @@
 {
   "name": "subalert",
   "version": "0.1.0",
+  "author": "EpicVillage",
   "private": true,
   "homepage": ".",
   "dependencies": {

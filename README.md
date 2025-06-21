@@ -319,6 +319,10 @@ The app can be deployed to any static hosting service:
 
 Note: AI features require serverless function support.
 
+## 👨‍💻 Author
+
+Created by [EpicVillage](https://github.com/EpicVillage)
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -336,4 +340,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<p align="center">Made with ❤️ for subscription sanity</p>
+<p align="center">Made with ❤️ by <a href="https://github.com/EpicVillage">EpicVillage</a> for subscription sanity</p>
