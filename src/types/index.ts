@@ -17,6 +17,7 @@ export interface API {
   cost?: number;
   expiryDate?: string;
   billingCycle?: 'monthly' | 'yearly' | 'one-time';
+  autoRenews?: boolean; // Whether the subscription auto-renews
   category: string; // Now references category ID
   notes?: string;
   createdAt: string;

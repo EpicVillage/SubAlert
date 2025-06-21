@@ -1,4 +1,4 @@
-const CACHE_NAME = 'subalert-v2';
+const CACHE_NAME = 'subalert-v3';
 const urlsToCache = [
   '/',
   '/manifest.json'
@@ -17,6 +17,11 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Skip caching for POST requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
   // Network first for HTML to avoid stale content
   if (event.request.mode === 'navigate') {
     event.respondWith(

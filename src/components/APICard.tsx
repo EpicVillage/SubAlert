@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { API, Category } from '../types';
 import { differenceInDays, parseISO, format } from 'date-fns';
 import { getCategoryById } from '../utils/categories';
+import { getNextBillingDate, shouldShowAsRenewal } from '../utils/billing';
 import FeatureComparison from './FeatureComparison';
 
 interface APICardProps {
@@ -19,12 +20,22 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
 
   const getDaysLeft = () => {
     if (!api.expiryDate) return null;
+    
+    // For auto-renewing subscriptions, calculate from next billing date
+    if (shouldShowAsRenewal(api)) {
+      const nextBilling = getNextBillingDate(api.expiryDate, api.billingCycle);
+      if (nextBilling) {
+        return differenceInDays(nextBilling, new Date());
+      }
+    }
+    
     return differenceInDays(parseISO(api.expiryDate), new Date());
   };
 
   const daysLeft = getDaysLeft();
+  const isRenewal = shouldShowAsRenewal(api);
   const isExpiringSoon = daysLeft !== null && daysLeft > 0 && daysLeft <= 7;
-  const isExpired = daysLeft !== null && daysLeft < 0;
+  const isExpired = daysLeft !== null && daysLeft < 0 && !isRenewal;
 
   const category = getCategoryById(categories, api.category) || {
     id: 'other',
@@ -53,41 +64,43 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
           <span>{api.email}</span>
         </div>
 
-        <div className="api-field">
-          <label>API Key:</label>
-          <div className="api-key-display">
-            <span>{showKey ? api.apiKey : '••••••••'}</span>
-            <div className="api-key-actions">
-              <button 
-                className={`btn-icon-small ${copied ? 'copied' : ''}`}
-                onClick={() => {
-                  navigator.clipboard.writeText(api.apiKey);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-                title={copied ? "Copied!" : "Copy to clipboard"}
-              >
-                {copied ? (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
-                    <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
-                )}
-              </button>
-              <button 
-                className="btn-icon-small"
-                onClick={() => setShowKey(!showKey)}
-                title={showKey ? 'Hide' : 'Show'}
-              >
-                {showKey ? '🙈' : '👁️'}
-              </button>
+        {api.apiKey && (
+          <div className="api-field">
+            <label>API Key:</label>
+            <div className="api-key-display">
+              <span>{showKey ? api.apiKey : '••••••••'}</span>
+              <div className="api-key-actions">
+                <button 
+                  className={`btn-icon-small ${copied ? 'copied' : ''}`}
+                  onClick={() => {
+                    navigator.clipboard.writeText(api.apiKey);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  title={copied ? "Copied!" : "Copy to clipboard"}
+                >
+                  {copied ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                  )}
+                </button>
+                <button 
+                  className="btn-icon-small"
+                  onClick={() => setShowKey(!showKey)}
+                  title={showKey ? 'Hide' : 'Show'}
+                >
+                  {showKey ? '🙈' : '👁️'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {api.subscriptionType === 'paid' && (
           <>
@@ -99,13 +112,30 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
             )}
             {api.expiryDate && (
               <div className="api-field">
-                <label>Expires:</label>
+                <label>{isRenewal ? 'Next Billing:' : 'Expires:'}</label>
                 <span className={isExpiringSoon ? 'text-warning' : isExpired ? 'text-danger' : ''}>
-                  {format(parseISO(api.expiryDate), 'dd/MM/yyyy')}
+                  {(() => {
+                    const displayDate = isRenewal 
+                      ? getNextBillingDate(api.expiryDate, api.billingCycle)
+                      : parseISO(api.expiryDate);
+                    return displayDate ? format(displayDate, 'dd/MM/yyyy') : 'N/A';
+                  })()}
                   {daysLeft !== null && (
-                    <small> ({isExpired ? `${Math.abs(daysLeft)} days ago` : `${daysLeft} days`})</small>
+                    <small> 
+                      {isRenewal 
+                        ? `(renews in ${daysLeft} days)`
+                        : isExpired 
+                          ? `(${Math.abs(daysLeft)} days ago)` 
+                          : `(${daysLeft} days)`
+                      }
+                    </small>
                   )}
                 </span>
+                {isRenewal && (
+                  <div style={{ marginTop: '0.25rem' }}>
+                    <small className="text-secondary">🔄 Auto-renews {api.billingCycle}</small>
+                  </div>
+                )}
               </div>
             )}
           </>

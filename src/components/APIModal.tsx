@@ -19,6 +19,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     cost: '',
     expiryDate: '',
     billingCycle: 'monthly' as 'monthly' | 'yearly' | 'one-time',
+    autoRenews: true,
     category: 'other',
     notes: ''
   });
@@ -39,6 +40,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
         cost: api.cost?.toString() || '',
         expiryDate: api.expiryDate || '',
         billingCycle: api.billingCycle || 'monthly',
+        autoRenews: api.autoRenews !== false, // Default to true if not set
         category: api.category || 'other',
         notes: api.notes || ''
       });
@@ -101,6 +103,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
       cost: formData.cost ? parseFloat(formData.cost) : undefined,
       expiryDate: formData.expiryDate || undefined,
       billingCycle: formData.billingCycle,
+      autoRenews: formData.subscriptionType === 'paid' ? formData.autoRenews : undefined,
       category: formData.category,
       notes: formData.notes || undefined,
       createdAt: api?.createdAt || new Date().toISOString(),
@@ -275,8 +278,29 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
               </div>
 
               {formData.billingCycle !== 'one-time' && (
-                <div className="form-group">
-                  <label htmlFor="expiryDate">Expiry/Renewal Date</label>
+                <>
+                  <div className="form-group">
+                    <label htmlFor="autoRenews" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <input
+                        type="checkbox"
+                        id="autoRenews"
+                        checked={formData.autoRenews}
+                        onChange={(e) => setFormData({ ...formData, autoRenews: e.target.checked })}
+                        style={{ width: 'auto', marginBottom: 0 }}
+                      />
+                      <span>Auto-renews</span>
+                    </label>
+                    <small style={{ marginTop: '0.25rem', display: 'block', color: 'var(--text-secondary)' }}>
+                      {formData.autoRenews 
+                        ? 'Subscription will automatically renew on the billing date'
+                        : 'Subscription will expire on the set date'}
+                    </small>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="expiryDate">
+                      {formData.autoRenews ? 'Next Billing Date' : 'Expiry Date'}
+                    </label>
                   <input
                     type="date"
                     id="expiryDate"
@@ -289,7 +313,8 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
                       }
                     }}
                   />
-                </div>
+                  </div>
+                </>
               )}
             </>
           )}

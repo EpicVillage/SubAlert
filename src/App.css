@@ -2431,3 +2431,7 @@ form {
     max-width: 320px;
   }
 }
+
+.text-secondary {
+  color: var(--text-secondary);
+}

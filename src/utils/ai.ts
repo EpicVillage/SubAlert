@@ -6,6 +6,40 @@ interface AIProvider {
   getFeatureComparison: (apiKey: string, api: API) => Promise<any>;
 }
 
+// Helper function to validate and fix AI response
+const validateComparisonResponse = (data: any): any => {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid response structure');
+  }
+  
+  // Fix alternatives if present
+  if (data.alternatives && Array.isArray(data.alternatives)) {
+    data.alternatives = data.alternatives.map((alt: any) => {
+      // Fix billingCycle if it's not valid
+      if (alt.billingCycle !== 'monthly' && alt.billingCycle !== 'yearly') {
+        alt.billingCycle = 'monthly'; // Default to monthly
+      }
+      
+      // Ensure savings is a number
+      if (typeof alt.savings === 'string') {
+        alt.savings = parseFloat(alt.savings) || 0;
+      }
+      if (typeof alt.savings !== 'number') {
+        alt.savings = 0;
+      }
+      
+      // Ensure cost is a number
+      if (typeof alt.cost === 'string') {
+        alt.cost = parseFloat(alt.cost) || 0;
+      }
+      
+      return alt;
+    });
+  }
+  
+  return data;
+};
+
 // Helper function to determine if we should use the proxy
 const getApiEndpoint = (provider: string): string => {
   // Use proxy in production or when API endpoint exists
@@ -119,7 +153,8 @@ The response must be a valid JSON object with this exact structure:
 Rules:
 - Use actual boolean values (true/false) not strings for current/alternative
 - Use actual numbers for cost and savings, not strings
-- billingCycle must be exactly "monthly" or "yearly"
+- billingCycle must be EXACTLY "monthly" or "yearly" (not "N/A", "one-time", etc)
+- If a service is free or has no recurring billing, use "monthly" with cost 0
 - importance must be exactly "high", "medium", or "low"
 - Include 5-8 specific features for comparison
 - Calculate real savings percentage as a number
@@ -173,13 +208,15 @@ Type: ${api.subscriptionType}`
       cleanContent = cleanContent.trim();
       
       // Try to parse
-      return JSON.parse(cleanContent);
+      const parsed = JSON.parse(cleanContent);
+      return validateComparisonResponse(parsed);
     } catch (e) {
       // If parsing fails, try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
-          return JSON.parse(jsonMatch[0]);
+          const parsed = JSON.parse(jsonMatch[0]);
+          return validateComparisonResponse(parsed);
         } catch (e2) {
           console.error('Failed to parse extracted JSON:', jsonMatch[0]);
           throw new Error(`JSON parsing failed: ${e2 instanceof Error ? e2.message : String(e2)}`);
@@ -321,13 +358,15 @@ Type: ${api.subscriptionType}`
       cleanContent = cleanContent.trim();
       
       // Try to parse
-      return JSON.parse(cleanContent);
+      const parsed = JSON.parse(cleanContent);
+      return validateComparisonResponse(parsed);
     } catch (e) {
       // If parsing fails, try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
-          return JSON.parse(jsonMatch[0]);
+          const parsed = JSON.parse(jsonMatch[0]);
+          return validateComparisonResponse(parsed);
         } catch (e2) {
           console.error('Failed to parse extracted JSON:', jsonMatch[0]);
           throw new Error(`JSON parsing failed: ${e2 instanceof Error ? e2.message : String(e2)}`);
