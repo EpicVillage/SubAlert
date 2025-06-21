@@ -103,6 +103,10 @@
   gap: 1rem;
 }
 
+.toggle-label > div {
+  flex: 1;
+}
+
 .toggle-description {
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -122,6 +126,7 @@
   border-radius: 34px;
   transition: background 0.3s ease;
   flex-shrink: 0;
+  display: block;
 }
 
 .toggle-slider::before {
@@ -175,6 +180,11 @@
 .info-message p {
   margin: 0;
   color: var(--text-secondary);
+}
+
+/* Form group styling for mobile settings */
+.mobile-settings-section .form-group {
+  margin: 0;
 }
 
 /* Dark mode adjustments */
