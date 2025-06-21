@@ -149,17 +149,24 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, onS
       <h3>Telegram Notifications</h3>
       
       <div className="form-group">
-        <label htmlFor="enableNotifications" className="toggle-label">
-          <span>Enable Notifications</span>
-          <input
-            type="checkbox"
-            id="enableNotifications"
-            checked={formData.enableNotifications}
-            onChange={(e) => setFormData({ ...formData, enableNotifications: e.target.checked })}
-            className="toggle-input"
-          />
-          <span className="toggle-slider"></span>
-        </label>
+        <div className="toggle-container">
+          <div className="toggle-content">
+            <h4>Enable Notifications</h4>
+            <p className="toggle-description">
+              Get alerts before subscriptions expire
+            </p>
+          </div>
+          <label htmlFor="enableNotifications" className="toggle-switch">
+            <input
+              type="checkbox"
+              id="enableNotifications"
+              checked={formData.enableNotifications}
+              onChange={(e) => setFormData({ ...formData, enableNotifications: e.target.checked })}
+              className="toggle-input"
+            />
+            <span className="toggle-slider"></span>
+          </label>
+        </div>
       </div>
 
       {formData.enableNotifications && (

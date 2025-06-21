@@ -198,7 +198,45 @@
 
 /* Form group styling for mobile settings */
 .mobile-settings-section .form-group {
-  margin: 0;
+  margin: 0 0 1rem 0;
+}
+
+.mobile-settings-section .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.mobile-settings-section .form-group label:not(.toggle-switch) {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mobile-settings-section input[type="text"],
+.mobile-settings-section input[type="password"],
+.mobile-settings-section input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.mobile-settings-section .input-with-button {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mobile-settings-section .input-with-button input {
+  flex: 1;
+}
+
+.mobile-settings-section .btn {
+  width: 100%;
+  margin-top: 1rem;
 }
 
 /* Dark mode adjustments */
