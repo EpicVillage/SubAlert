@@ -30,6 +30,10 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ onRefresh, children }) =>
     if (distance > 0 && containerRef.current?.scrollTop === 0) {
       e.preventDefault();
       setPullDistance(Math.min(distance, maxPull));
+    } else if (distance < 0) {
+      // Allow scrolling up when pulling up
+      setTouchStart(0);
+      setPullDistance(0);
     }
   }, [touchStart, isRefreshing]);
 
@@ -68,7 +72,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ onRefresh, children }) =>
       <div
         className={`pull-to-refresh-indicator ${isRefreshing ? 'refreshing' : ''}`}
         style={{
-          transform: `translateY(${pullDistance}px)`,
+          transform: `translateX(-50%) translateY(${pullDistance}px)`,
           opacity: pullDistance > 0 ? 1 : 0,
         }}
       >

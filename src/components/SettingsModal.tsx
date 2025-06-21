@@ -189,9 +189,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                 setActiveSection('telegram');
                 setValidationErrors({});
               }}
+              title="Telegram Notifications"
             >
               <span className="settings-nav-icon">💬</span>
-              Telegram
+              <span>Telegram</span>
             </button>
             <button
               className={`settings-nav-item ${activeSection === 'backup' ? 'active' : ''}`}
@@ -199,9 +200,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                 setActiveSection('backup');
                 setValidationErrors({});
               }}
+              title="Backup & Restore"
             >
               <span className="settings-nav-icon">💾</span>
-              Backup
+              <span>Backup</span>
             </button>
             <button
               className={`settings-nav-item ${activeSection === 'security' ? 'active' : ''}`}
@@ -209,9 +211,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                 setActiveSection('security');
                 setValidationErrors({});
               }}
+              title="Security Settings"
             >
               <span className="settings-nav-icon">🔐</span>
-              Security
+              <span>Security</span>
             </button>
             <button
               className={`settings-nav-item ${activeSection === 'ai' ? 'active' : ''}`}
@@ -219,9 +222,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onSave, onClose
                 setActiveSection('ai');
                 setValidationErrors({});
               }}
+              title="AI Settings"
             >
               <span className="settings-nav-icon">🤖</span>
-              AI
+              <span>AI</span>
             </button>
           </div>
 

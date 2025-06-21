@@ -21,7 +21,7 @@ const MobileAPICard: React.FC<MobileAPICardProps> = ({ api, categories, onEdit, 
       setSwipeOffset(-100);
     },
     onSwipeRight: () => {
-      setSwipeOffset(0);
+      setSwipeOffset(100);
     },
     threshold: 30,
   });
@@ -40,7 +40,7 @@ const MobileAPICard: React.FC<MobileAPICardProps> = ({ api, categories, onEdit, 
 
   return (
     <div className={`mobile-api-card-wrapper ${isDeleting ? 'deleting' : ''}`}>
-      <div className="swipe-actions">
+      <div className="swipe-actions swipe-actions-left">
         <button className="swipe-action edit" onClick={handleEdit}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M11 4H4C2.89543 4 2 4.89543 2 6V20C2 21.1046 2.89543 22 4 22H18C19.1046 22 20 21.1046 20 20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -48,6 +48,8 @@ const MobileAPICard: React.FC<MobileAPICardProps> = ({ api, categories, onEdit, 
           </svg>
           Edit
         </button>
+      </div>
+      <div className="swipe-actions swipe-actions-right">
         <button className="swipe-action delete" onClick={handleDelete}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

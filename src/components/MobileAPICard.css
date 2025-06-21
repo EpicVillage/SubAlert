@@ -11,6 +11,7 @@
   transition: transform 0.3s ease;
   will-change: transform;
   cursor: grab;
+  background: var(--bg-primary);
 }
 
 .mobile-api-card-content:active {
@@ -20,11 +21,18 @@
 .swipe-actions {
   position: absolute;
   top: 0;
-  right: 0;
   bottom: 0;
   display: flex;
   align-items: stretch;
   z-index: 1;
+}
+
+.swipe-actions-left {
+  left: 0;
+}
+
+.swipe-actions-right {
+  right: 0;
 }
 
 .swipe-action {
@@ -83,6 +91,17 @@
   50% {
     transform: scale(0.98);
   }
+}
+
+/* Hide card shadow to prevent delete button outline showing */
+.mobile-api-card-content .api-card {
+  box-shadow: none;
+  border: 1px solid var(--border-color);
+}
+
+.mobile-api-card-content .api-card:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Touch optimizations */
