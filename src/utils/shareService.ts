@@ -117,7 +117,7 @@ class ShareService {
   parseShareURL(url: string): { encrypted: string; password: string } | null {
     try {
       const urlObj = new URL(url);
-      const match = urlObj.hash.match(/#\/share\/([^?]+)/);
+      const match = urlObj.hash.match(/#\/share\/([^?]+)\?key=([^&]+)/);
       
       if (!match) return null;
 
@@ -128,7 +128,7 @@ class ShareService {
         encrypted += '=';
       }
 
-      const password = urlObj.searchParams.get('key');
+      const password = decodeURIComponent(match[2]);
       
       if (!password) return null;
 

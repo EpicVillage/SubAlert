@@ -17,11 +17,8 @@ const ShareImport: React.FC = () => {
   useEffect(() => {
     const handleImport = async () => {
       try {
-        // For HashRouter, we need to construct the URL properly
-        const currentHash = window.location.hash;
-        const fullUrl = window.location.origin + '/' + currentHash;
-        
-        const parsed = shareService.parseShareURL(fullUrl);
+        // Parse the current URL
+        const parsed = shareService.parseShareURL(window.location.href);
         
         if (!parsed) {
           throw new Error('Invalid share link format');
