@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { API, Category } from '../types';
 import APICard from './APICard';
+import CompactAPICard from './CompactAPICard';
 import MobileAPICard from './MobileAPICard';
 import CategoryView from './CategoryView';
+import ListView from './ListView';
 import Stats from './Stats';
 import { differenceInDays, parseISO } from 'date-fns';
 import BottomSheet from './BottomSheet';
@@ -22,9 +24,25 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false, isMobile = false, selectedIds = new Set(), onToggleSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'expiring' | 'paid' | 'free'>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'category'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'category' | 'list'>(() => {
+    const saved = localStorage.getItem('viewMode');
+    return (saved as 'grid' | 'category' | 'list') || 'grid';
+  });
   const [filteredAPIs, setFilteredAPIs] = useState<API[]>(apis);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [isCompactMode, setIsCompactMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('compactMode');
+    return saved === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('viewMode', viewMode);
+  }, [viewMode]);
+
+  useEffect(() => {
+    localStorage.setItem('compactMode', isCompactMode.toString());
+  }, [isCompactMode]);
 
   useEffect(() => {
     let filtered = apis;
@@ -80,7 +98,8 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
       />
 
       <div className="filter-section">
-        <div className="view-toggle">
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+          <div className="view-toggle">
           <button 
             className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
@@ -104,6 +123,52 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
               <rect x="2" y="14" width="16" height="4" stroke="currentColor" strokeWidth="2"/>
             </svg>
           </button>
+          <button 
+            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+            title="List View"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="3" width="16" height="2" stroke="currentColor" strokeWidth="1.5"/>
+              <rect x="2" y="9" width="16" height="2" stroke="currentColor" strokeWidth="1.5"/>
+              <rect x="2" y="15" width="16" height="2" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </button>
+          </div>
+          {viewMode === 'list' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              {expandedRows.size < filteredAPIs.length && (
+                <button 
+                  className="btn btn-sm btn-secondary expand-collapse-btn"
+                  onClick={() => {
+                    const allIds = new Set(filteredAPIs.map(api => api.id));
+                    setExpandedRows(allIds);
+                  }}
+                  title="Expand all rows"
+                >
+                  Expand All
+                </button>
+              )}
+              {expandedRows.size > 0 && (
+                <button 
+                  className="btn btn-sm btn-secondary expand-collapse-btn"
+                  onClick={() => setExpandedRows(new Set())}
+                  title="Collapse all expanded rows"
+                >
+                  Collapse All ({expandedRows.size})
+                </button>
+              )}
+            </div>
+          )}
+          {viewMode === 'grid' && (
+            <button 
+              className={`btn btn-sm btn-secondary compact-mode-btn ${isCompactMode ? 'active' : ''}`}
+              onClick={() => setIsCompactMode(!isCompactMode)}
+              title={isCompactMode ? "Switch to normal view" : "Switch to compact view"}
+            >
+              {isCompactMode ? 'Normal' : 'Compact'}
+            </button>
+          )}
         </div>
         <div className="search-wrapper">
           <svg className="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -143,10 +208,21 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
       </div>
 
       {viewMode === 'grid' ? (
-        <div className="api-grid">
+        <div className={`api-grid ${isCompactMode ? 'compact-grid' : ''}`}>
           {filteredAPIs.map(api => (
             isMobile ? (
               <MobileAPICard
+                key={api.id}
+                api={api}
+                categories={categories}
+                onEdit={() => onEditAPI(api)}
+                onDelete={() => onDeleteAPI(api.id)}
+                isEditMode={isEditMode}
+                isSelected={selectedIds.has(api.id)}
+                onToggleSelect={() => onToggleSelect?.(api.id)}
+              />
+            ) : isCompactMode ? (
+              <CompactAPICard
                 key={api.id}
                 api={api}
                 categories={categories}
@@ -179,7 +255,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
             </div>
           )}
         </div>
-      ) : (
+      ) : viewMode === 'category' ? (
         <CategoryView
           apis={filteredAPIs}
           categories={categories}
@@ -189,6 +265,18 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
           isEditMode={isEditMode}
           selectedIds={selectedIds}
           onToggleSelect={onToggleSelect}
+        />
+      ) : (
+        <ListView
+          apis={filteredAPIs}
+          categories={categories}
+          onEditAPI={onEditAPI}
+          onDeleteAPI={onDeleteAPI}
+          isEditMode={isEditMode}
+          selectedIds={selectedIds}
+          onToggleSelect={onToggleSelect}
+          expandedRows={expandedRows}
+          onExpandedRowsChange={setExpandedRows}
         />
       )}
       

@@ -17,6 +17,7 @@ export interface API {
   serviceName: string;
   serviceDescription?: string; // What does this service do?
   website?: string; // Service website URL
+  logo?: string; // Service logo URL or base64 data
   apiKey: string;
   websocketUrl?: string; // WebSocket URL for real-time connections
   customFields?: CustomField[]; // Array of custom fields with names and values

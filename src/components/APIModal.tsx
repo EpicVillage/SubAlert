@@ -13,6 +13,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     serviceName: '',
     serviceDescription: '',
     website: '',
+    logo: '',
     apiKey: '',
     websocketUrl: '',
     email: '',
@@ -31,6 +32,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
   const [showApiKeyField, setShowApiKeyField] = useState(false);
   const [showWebsocketField, setShowWebsocketField] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
+  const [fetchingLogo, setFetchingLogo] = useState(false);
 
   useEffect(() => {
     if (api) {
@@ -38,6 +40,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
         serviceName: api.serviceName,
         serviceDescription: api.serviceDescription || '',
         website: api.website || '',
+        logo: api.logo || '',
         apiKey: api.apiKey,
         websocketUrl: api.websocketUrl || '',
         email: api.email,
@@ -76,6 +79,35 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     const updated = [...customFields];
     updated[index] = { ...updated[index], [field]: val };
     setCustomFields(updated);
+  };
+
+  const fetchFavicon = async () => {
+    if (!formData.website) return;
+    
+    setFetchingLogo(true);
+    try {
+      // Extract domain from website URL
+      let domain = formData.website;
+      if (!domain.startsWith('http://') && !domain.startsWith('https://')) {
+        domain = 'https://' + domain;
+      }
+      const url = new URL(domain);
+      
+      // Try multiple favicon sources
+      const faviconUrls = [
+        `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=128`,
+        `https://icons.duckduckgo.com/ip3/${url.hostname}.ico`,
+        `${url.origin}/favicon.ico`,
+        `${url.origin}/favicon.png`
+      ];
+      
+      // Use Google's favicon service as primary option
+      setFormData({ ...formData, logo: faviconUrls[0] });
+    } catch (error) {
+      console.error('Error fetching favicon:', error);
+    } finally {
+      setFetchingLogo(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -130,6 +162,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
       serviceName: formData.serviceName,
       serviceDescription: formData.serviceDescription || undefined,
       website: formData.website || undefined,
+      logo: formData.logo || undefined,
       apiKey: formData.apiKey,
       websocketUrl: formData.websocketUrl || undefined,
       customFields: customFields.length > 0 ? customFields : undefined,
@@ -194,6 +227,41 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
               placeholder="https://example.com"
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="logo">Logo URL</label>
+            <div className="input-with-button">
+              <input
+                type="text"
+                id="logo"
+                value={formData.logo}
+                onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
+                placeholder="https://example.com/logo.png"
+              />
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={fetchFavicon}
+                disabled={!formData.website || fetchingLogo}
+                title="Fetch favicon from website"
+              >
+                {fetchingLogo ? '...' : '🔍 Fetch'}
+              </button>
+            </div>
+            {formData.logo && (
+              <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <img 
+                  src={formData.logo} 
+                  alt="Logo preview" 
+                  style={{ width: '24px', height: '24px', objectFit: 'contain' }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <small style={{ color: 'var(--text-secondary)' }}>Logo preview</small>
+              </div>
+            )}
           </div>
 
           {!showApiKeyField && !showWebsocketField && customFields.length === 0 && (

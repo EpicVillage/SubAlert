@@ -64,7 +64,19 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
               className="selection-checkbox"
             />
           )}
-          <h3>{api.serviceName}</h3>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {api.logo && (
+              <img 
+                src={api.logo} 
+                alt={`${api.serviceName} logo`}
+                style={{ width: '20px', height: '20px', objectFit: 'contain' }}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+            {api.serviceName}
+          </h3>
         </div>
         <span 
           className="category-badge" 
