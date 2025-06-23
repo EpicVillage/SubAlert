@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { API } from '../types';
 import { aiProviders, aiStorage } from '../utils/ai';
 import './FeatureComparison.css';
@@ -114,7 +115,7 @@ const FeatureComparison: React.FC<FeatureComparisonProps> = ({ api, onClose }) =
     return 'savings-none';
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal feature-comparison-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -235,7 +236,8 @@ const FeatureComparison: React.FC<FeatureComparisonProps> = ({ api, onClose }) =
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
