@@ -15,6 +15,11 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 - 🎨 **Dark Mode** - Easy on the eyes with automatic theme detection
 - 🤖 **AI Recommendations** - Get smart cost-saving insights with your own API key
 - 🔄 **Auto-Renewal Tracking** - Smart handling of recurring subscriptions
+- 🏷️ **Custom Fields** - Add unlimited custom fields with sensitive data protection
+- 🔗 **WebSocket URLs** - Track WebSocket endpoints alongside API keys
+- 🖼️ **Logo Support** - Automatic logo fetching from service websites
+- 📱 **Multiple Views** - Grid, List, and Compact views with seamless switching
+- 🔗 **Secure Sharing** - Share subscriptions via encrypted URLs or QR codes
 
 ### Calendar Integration
 - 📅 **Visual Calendar View** - See all renewals and expiries in month/week/agenda views
@@ -44,6 +49,7 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 - 💾 **Local Storage** - All data stays on your device
 - 🔒 **Secure API Storage** - API keys are stored safely
 - 🛡️ **Zero External Dependencies** - No tracking or analytics
+- 🔗 **Zero-Knowledge Sharing** - Share subscriptions without any server involvement
 
 ### Notifications & Alerts
 - 💬 **Telegram Integration** - Get notified before subscriptions expire
@@ -63,6 +69,13 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 - 🌈 **Gradient Text** - Eye-catching green to navy gradient logo
 - 🌓 **Theme-Aware** - Adaptive design for light/dark modes
 - 📱 **Responsive Design** - Works perfectly on all devices
+
+### Mobile Experience
+- 📱 **Touch-Optimized** - Swipe gestures and touch-friendly controls
+- 🎯 **Platform-Specific** - Pull-to-refresh on iOS, native feel on Android
+- 📐 **Adaptive Layouts** - Automatic layout adjustments for small screens
+- 🎨 **Bottom Sheet Modals** - Mobile-native settings interface
+- 👆 **Drag-to-Close** - Intuitive gesture controls for modals
 
 ## 🚀 Installation
 
@@ -160,11 +173,16 @@ AI features require deployment to Vercel or another platform due to CORS restric
 2. Fill in the required details:
    - **Service Name** (required)
    - **Service Description** - What does this service do?
-   - **Website** - Service URL for reference
+   - **Website** - Service URL for reference (auto-fetches logo)
    - **Category** - Choose from existing or create custom
    - **Subscription Type** - Free or Paid
    - **Associated Email** (required)
    - **API Key** (optional) - Click "+ Add API Key" to reveal field
+   - **WebSocket URL** (optional) - Click "+ Add WebSocket URL" for WebSocket endpoints
+   - **Custom Fields** (optional) - Click "+ Add Custom Field" for unlimited custom data
+     - Customizable field names
+     - Mark as sensitive for privacy protection
+     - Remove individual fields as needed
    - For paid subscriptions:
      - **Cost** (required)
      - **Billing Cycle** - Monthly, Yearly, or One-time
@@ -173,14 +191,20 @@ AI features require deployment to Vercel or another platform due to CORS restric
 3. Click "Add API" to save
 
 ### Managing Subscriptions
+- **View Modes**: Switch between Grid, List, and Compact views
+  - **Grid View**: Traditional card layout with full details
+  - **List View**: Table format with sortable columns and expandable rows
+  - **Compact View**: Space-efficient cards for viewing more at once
 - **Edit Mode**: Toggle edit mode to show/hide action buttons
 - **View/Hide API Keys**: Click the eye icon (👁️) - only shows if API key exists
 - **Copy API Key**: One-click copy with visual feedback
+- **Share Subscription**: Share via encrypted URL or QR code
 - **Compare Alternatives**: Available for paid subscriptions
 - **Auto-Renewal Tracking**: See "Next Billing" instead of "Expires" for auto-renewing subscriptions
 - **Search**: Real-time search by service name
 - **Filter**: Quick filters for All, Expiring Soon, Paid, Free
 - **Drag & Drop**: Reorganize between categories
+- **Bulk Actions**: Select multiple items for bulk operations
 
 ### Calendar View
 1. Click "📅 Calendar" button in the header
@@ -208,6 +232,24 @@ AI features require deployment to Vercel or another platform due to CORS restric
    - Include/exclude specific sections
    - Add custom notes
 4. Download professional PDF report
+
+### Secure Sharing
+1. Click "Share" button on any subscription (in edit mode)
+2. Select fields to share:
+   - Choose which information to include
+   - Sensitive fields are excluded by default
+   - Preview what will be shared
+3. Set expiration time:
+   - 1 hour, 1 day, 7 days, or 30 days
+   - Links expire automatically for security
+4. Share methods:
+   - **URL Sharing**: Copy encrypted link to clipboard
+   - **QR Code**: Generate and download QR code
+5. Security features:
+   - Client-side AES encryption
+   - Auto-generated secure passwords
+   - Zero server involvement (data in URL fragment)
+   - Expired links cannot be accessed
 
 ### Feature Comparison
 1. Click "Compare Alternatives" on any paid subscription
@@ -274,16 +316,23 @@ AI features require deployment to Vercel or another platform due to CORS restric
 - **PWA**: Service Worker with offline support
 - **Build**: Create React App with custom configuration
 - **AI Integration**: OpenAI & Anthropic APIs with Vercel Edge Functions
+- **Encryption**: CryptoJS for secure sharing
+- **QR Codes**: qrcode library for QR generation
+- **Routing**: React Router with HashRouter for share links
 
 ### Key Features Implementation
 - **Drag & Drop**: HTML5 Drag and Drop API
-- **Encryption**: Web Crypto API
+- **Encryption**: Web Crypto API & CryptoJS
 - **Biometrics**: WebAuthn API
 - **Notifications**: Telegram Bot API
 - **Date Handling**: date-fns library
 - **Calendar Export**: iCal format generation
 - **PDF Generation**: Client-side with jsPDF
 - **AI Proxy**: Vercel Edge Functions for CORS handling
+- **Logo Fetching**: Automatic favicon extraction from URLs
+- **Secure Sharing**: URL fragments for zero-server sharing
+- **Multiple Views**: Dynamic view switching with state persistence
+- **Custom Fields**: Flexible schema with sensitive data protection
 
 ## 🐛 Troubleshooting
 

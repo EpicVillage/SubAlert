@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import CalendarView from './components/CalendarView';
 import Header from './components/Header';
@@ -11,6 +11,7 @@ import ConfirmModal from './components/ConfirmModal';
 import MasterPasswordLock from './components/MasterPasswordLock';
 import PasswordModal from './components/PasswordModal';
 import ExportOptionsModal from './components/ExportOptionsModal';
+import ShareImport from './components/ShareImport';
 import { AISettings } from './components/AISettings';
 import { AIRecommendations } from './components/AIRecommendations';
 import { AIMenu } from './components/AIMenu';
@@ -344,6 +345,7 @@ function App() {
               onEditAPI={handleEditAPI}
             />
           } />
+          <Route path="/share/:data" element={<ShareImport />} />
         </Routes>
         
         {showAPIModal && (

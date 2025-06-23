@@ -1346,6 +1346,15 @@ form {
   z-index: 1;
 }
 
+.action-share {
+  color: var(--success);
+}
+
+.action-share:hover {
+  color: #059669;
+  background: rgba(5, 150, 105, 0.05);
+}
+
 .action-edit {
   color: var(--primary);
 }

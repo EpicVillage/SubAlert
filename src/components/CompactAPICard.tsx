@@ -3,6 +3,7 @@ import { API, Category } from '../types';
 import { differenceInDays, parseISO, format } from 'date-fns';
 import { getCategoryById } from '../utils/categories';
 import { getNextBillingDate, shouldShowAsRenewal } from '../utils/billing';
+import ShareModal from './ShareModal';
 
 interface CompactAPICardProps {
   api: API;
@@ -25,6 +26,7 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
 }) => {
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const getDaysLeft = () => {
     if (!api.expiryDate) return null;
@@ -53,6 +55,7 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
   };
 
   return (
+    <>
     <div className={`api-card compact ${isEditMode ? 'edit-mode' : ''} ${isEditMode && isSelected ? 'selected' : ''} ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}>
       <div className="compact-content">
         <div className="compact-header">
@@ -157,6 +160,13 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
 
       {isEditMode && (
         <div className="api-card-actions-modern">
+          <button className="action-btn action-share" onClick={() => setShowShareModal(true)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37061L7.08259 9.34064C6.54303 8.93015 5.8089 8.66667 5 8.66667C3.34315 8.66667 2 10.0098 2 11.6667C2 13.3235 3.34315 14.6667 5 14.6667C5.8089 14.6667 6.54303 14.4032 7.08259 13.9927L15.0227 17.9627C15.0077 18.0841 15 18.2078 15 18.3333C15 19.9902 16.3431 21.3333 18 21.3333C19.6569 21.3333 21 19.9902 21 18.3333C21 16.6765 19.6569 15.3333 18 15.3333C17.1911 15.3333 16.457 15.5968 15.9174 16.0073L7.97733 12.0373C7.99226 11.9159 8 11.7922 8 11.6667C8 11.5412 7.99226 11.4175 7.97733 11.2961L15.9174 7.32606C16.457 7.73655 17.1911 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>Share</span>
+          </button>
+          <div className="action-divider"></div>
           <button className="action-btn action-edit" onClick={onEdit}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M11 4H4C2.89543 4 2 4.89543 2 6V20C2 21.1046 2.89543 22 4 22H18C19.1046 22 20 21.1046 20 20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -175,6 +185,14 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
         </div>
       )}
     </div>
+    
+    {showShareModal && (
+      <ShareModal
+        subscription={api}
+        onClose={() => setShowShareModal(false)}
+      />
+    )}
+    </>
   );
 };
 
