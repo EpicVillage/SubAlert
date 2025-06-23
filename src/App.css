@@ -3230,6 +3230,26 @@ form {
   margin-top: auto;
 }
 
+/* Mobile compact grid adjustments */
+@media (max-width: 768px) {
+  .compact-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .api-card.compact {
+    font-size: 0.875rem;
+  }
+  
+  .compact-service-name {
+    font-size: 0.75rem;
+  }
+  
+  .compact-info {
+    font-size: 0.7rem;
+  }
+}
+
 /* Mobile responsive list view */
 @media (max-width: 768px) {
   .list-view {

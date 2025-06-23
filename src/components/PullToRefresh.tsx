@@ -41,10 +41,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({ onRefresh, children }) =>
     if (pullDistance > threshold && !isRefreshing) {
       setIsRefreshing(true);
       
-      // Haptic feedback on supported devices
-      if ('vibrate' in navigator) {
-        navigator.vibrate(10);
-      }
+      // Removed vibration to improve user experience
 
       try {
         await onRefresh();

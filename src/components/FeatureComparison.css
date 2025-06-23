@@ -1,8 +1,11 @@
 .feature-comparison-modal {
   max-width: 900px;
   width: 90%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
 .current-service-summary {
@@ -255,6 +258,15 @@
 @media (max-width: 768px) {
   .feature-comparison-modal {
     width: 95%;
+    max-height: calc(100vh - 2rem);
+    margin: 1rem auto;
+  }
+  
+  .feature-comparison-modal .modal-content {
+    max-height: calc(100vh - 10rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2rem;
   }
 
   .pros-cons {

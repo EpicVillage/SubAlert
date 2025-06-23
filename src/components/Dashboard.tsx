@@ -210,7 +210,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
       {viewMode === 'grid' ? (
         <div className={`api-grid ${isCompactMode ? 'compact-grid' : ''}`}>
           {filteredAPIs.map(api => (
-            isMobile ? (
+            isMobile && !isCompactMode ? (
               <MobileAPICard
                 key={api.id}
                 api={api}

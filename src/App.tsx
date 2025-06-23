@@ -50,6 +50,7 @@ function App() {
   const [isMasterPasswordLocked, setIsMasterPasswordLocked] = useState(false);
   const [showAIModal, setShowAIModal] = useState<'menu' | 'settings' | 'recommendations' | null>(null);
   const isTouchDevice = useIsTouchDevice();
+  const isAndroid = /Android/i.test(navigator.userAgent);
 
   useEffect(() => {
     // Setup notification scheduler
@@ -295,7 +296,7 @@ function App() {
         <Routes>
           <Route path="/" element={
             isTouchDevice ? (
-              <PullToRefresh onRefresh={handleRefresh}>
+              isAndroid ? (
                 <Dashboard 
                   apis={apis}
                   categories={categories}
@@ -307,7 +308,21 @@ function App() {
                   selectedIds={selectedIds}
                   onToggleSelect={handleToggleSelect}
                 />
-              </PullToRefresh>
+              ) : (
+                <PullToRefresh onRefresh={handleRefresh}>
+                  <Dashboard 
+                    apis={apis}
+                    categories={categories}
+                    onEditAPI={handleEditAPI}
+                    onDeleteAPI={handleDeleteAPI}
+                    onUpdateAPI={handleUpdateAPI}
+                    isEditMode={isEditMode}
+                    isMobile={true}
+                    selectedIds={selectedIds}
+                    onToggleSelect={handleToggleSelect}
+                  />
+                </PullToRefresh>
+              )
             ) : (
               <Dashboard 
                 apis={apis}
