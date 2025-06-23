@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 0.5rem;
   background: var(--bg-primary);
+  padding-bottom: 2rem;
 }
 
 .mobile-settings-item {
@@ -68,6 +69,7 @@
   flex-direction: column;
   gap: 1.5rem;
   background: var(--bg-primary);
+  padding-bottom: 2rem;
 }
 
 .mobile-settings-back {

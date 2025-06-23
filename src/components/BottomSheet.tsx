@@ -27,8 +27,14 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, title, child
   }, [isOpen]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    startY.current = e.touches[0].clientY;
-    setIsDragging(true);
+    // Only allow dragging from the handle area
+    const target = e.target as HTMLElement;
+    const handleContainer = target.closest('.bottom-sheet-handle-container');
+    
+    if (handleContainer) {
+      startY.current = e.touches[0].clientY;
+      setIsDragging(true);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -68,11 +74,10 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, title, child
         style={{
           transform: `translateY(${dragOffset}px)`,
         }}
-        onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="bottom-sheet-handle-container">
+        <div className="bottom-sheet-handle-container" onTouchStart={handleTouchStart}>
           <div className="bottom-sheet-handle" />
         </div>
         
