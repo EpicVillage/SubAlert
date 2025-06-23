@@ -166,6 +166,21 @@ function App() {
     await new Promise(resolve => setTimeout(resolve, 800));
   }, []);
 
+  // Listen for storage changes (from imports or other tabs)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const refreshedApis = storage.getAPIs();
+      setApis(refreshedApis);
+    };
+
+    // Custom event for when APIs are updated
+    window.addEventListener('apis-updated', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('apis-updated', handleStorageChange);
+    };
+  }, []);
+
   // Selection handlers
   const handleToggleSelect = (id: string) => {
     const newSelected = new Set(selectedIds);

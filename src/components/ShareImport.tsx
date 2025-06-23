@@ -94,6 +94,9 @@ const ShareImport: React.FC = () => {
       apis.push(newApi);
       storage.saveAPIs(apis);
 
+      // Dispatch event to update the main app
+      window.dispatchEvent(new Event('apis-updated'));
+
       showNotification('success', 'Import Successful', `${sharedData.serviceName} has been added to your subscriptions`);
       navigate('/');
     } catch (err) {

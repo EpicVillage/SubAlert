@@ -1,6 +1,8 @@
 .share-modal {
   max-width: 600px;
   width: 90%;
+  position: relative;
+  z-index: 10000;
 }
 
 .share-section {
@@ -224,6 +226,15 @@
 @media (max-width: 768px) {
   .share-modal {
     width: 95%;
+    max-width: none;
+    max-height: 90vh;
+    margin: 1rem;
+  }
+  
+  .modal-content {
+    max-height: calc(90vh - 60px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .field-selection {
@@ -246,5 +257,10 @@
   
   .share-url-input {
     font-size: 0.75rem;
+  }
+  
+  .qr-code {
+    width: 200px;
+    height: 200px;
   }
 }
