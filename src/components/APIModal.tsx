@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API, Category } from '../types';
+import { API, Category, CustomField } from '../types';
 
 interface APIModalProps {
   api: API | null;
@@ -14,6 +14,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     serviceDescription: '',
     website: '',
     apiKey: '',
+    websocketUrl: '',
     email: '',
     subscriptionType: 'free' as 'free' | 'paid',
     cost: '',
@@ -24,8 +25,11 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     notes: ''
   });
 
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [showApiKey, setShowApiKey] = useState(false);
+  const [showWebsocket, setShowWebsocket] = useState(false);
   const [showApiKeyField, setShowApiKeyField] = useState(false);
+  const [showWebsocketField, setShowWebsocketField] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -35,6 +39,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
         serviceDescription: api.serviceDescription || '',
         website: api.website || '',
         apiKey: api.apiKey,
+        websocketUrl: api.websocketUrl || '',
         email: api.email,
         subscriptionType: api.subscriptionType,
         cost: api.cost?.toString() || '',
@@ -44,15 +49,34 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
         category: api.category || 'other',
         notes: api.notes || ''
       });
-      // Show API key field if editing and API key exists
+      // Show fields if editing and they exist
       setShowApiKeyField(!!api.apiKey);
+      setShowWebsocketField(!!api.websocketUrl);
+      // Set custom fields
+      setCustomFields(api.customFields || []);
     } else {
-      // Reset API key field visibility for new entries
+      // Reset field visibility for new entries
       setShowApiKeyField(false);
+      setShowWebsocketField(false);
+      setCustomFields([]);
     }
     // Clear validation errors when modal opens
     setValidationErrors({});
   }, [api]);
+
+  const addCustomField = () => {
+    setCustomFields([...customFields, { name: '', value: '', isSensitive: false }]);
+  };
+
+  const removeCustomField = (index: number) => {
+    setCustomFields(customFields.filter((_, i) => i !== index));
+  };
+
+  const updateCustomField = (index: number, field: 'name' | 'value' | 'isSensitive', val: string | boolean) => {
+    const updated = [...customFields];
+    updated[index] = { ...updated[index], [field]: val };
+    setCustomFields(updated);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +85,14 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
     const errors: Record<string, boolean> = {};
     if (!formData.serviceName.trim()) errors.serviceName = true;
     if (showApiKeyField && !formData.apiKey.trim()) errors.apiKey = true;
+    if (showWebsocketField && !formData.websocketUrl.trim()) errors.websocketUrl = true;
     if (!formData.email.trim()) errors.email = true;
+    
+    // Validate custom fields
+    customFields.forEach((field, index) => {
+      if (!field.name.trim()) errors[`customFieldName${index}`] = true;
+      if (!field.value.trim()) errors[`customFieldValue${index}`] = true;
+    });
     
     // Additional validation for paid subscriptions
     if (formData.subscriptionType === 'paid') {
@@ -81,6 +112,8 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
           document.getElementById('serviceName')?.focus();
         } else if (errors.apiKey) {
           document.getElementById('apiKey')?.focus();
+        } else if (errors.websocketUrl) {
+          document.getElementById('websocketUrl')?.focus();
         } else if (errors.email) {
           document.getElementById('email')?.focus();
         } else if (errors.cost) {
@@ -98,6 +131,8 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
       serviceDescription: formData.serviceDescription || undefined,
       website: formData.website || undefined,
       apiKey: formData.apiKey,
+      websocketUrl: formData.websocketUrl || undefined,
+      customFields: customFields.length > 0 ? customFields : undefined,
       email: formData.email,
       subscriptionType: formData.subscriptionType,
       cost: formData.cost ? parseFloat(formData.cost) : undefined,
@@ -161,20 +196,52 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
             />
           </div>
 
-          {!showApiKeyField ? (
-            <div className="form-group">
+          {!showApiKeyField && !showWebsocketField && customFields.length === 0 && (
+            <div className="form-group" style={{ display: 'flex', gap: '0.5rem' }}>
               <button
                 type="button"
                 className="btn btn-secondary"
                 onClick={() => setShowApiKeyField(true)}
-                style={{ width: '100%' }}
+                style={{ flex: 1 }}
               >
                 + Add API Key
               </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowWebsocketField(true)}
+                style={{ flex: 1 }}
+              >
+                + Add WebSocket
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={addCustomField}
+                style={{ flex: 1 }}
+              >
+                + Add Custom
+              </button>
             </div>
-          ) : (
+          )}
+
+          {showApiKeyField && (
             <div className="form-group">
-              <label htmlFor="apiKey">API Key</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="apiKey">API Key</label>
+                <button
+                  type="button"
+                  className="btn-icon-small"
+                  onClick={() => {
+                    setShowApiKeyField(false);
+                    setFormData({ ...formData, apiKey: '' });
+                  }}
+                  title="Remove API Key"
+                  style={{ marginLeft: 'auto', color: 'var(--text-danger)' }}
+                >
+                  ×
+                </button>
+              </div>
               <div className="input-with-button">
                 <input
                   type={showApiKey ? 'text' : 'password'}
@@ -196,6 +263,136 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
                   {showApiKey ? '🙈' : '👁️'}
                 </button>
               </div>
+            </div>
+          )}
+
+          {showWebsocketField && (
+            <div className="form-group">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="websocketUrl">WebSocket URL</label>
+                <button
+                  type="button"
+                  className="btn-icon-small"
+                  onClick={() => {
+                    setShowWebsocketField(false);
+                    setFormData({ ...formData, websocketUrl: '' });
+                  }}
+                  title="Remove WebSocket URL"
+                  style={{ marginLeft: 'auto', color: 'var(--text-danger)' }}
+                >
+                  ×
+                </button>
+              </div>
+              <div className="input-with-button">
+                <input
+                  type={showWebsocket ? 'text' : 'password'}
+                  id="websocketUrl"
+                  className={validationErrors.websocketUrl ? 'error' : ''}
+                  value={formData.websocketUrl}
+                  onChange={(e) => {
+                    setFormData({ ...formData, websocketUrl: e.target.value });
+                    if (validationErrors.websocketUrl) {
+                      setValidationErrors({ ...validationErrors, websocketUrl: false });
+                    }
+                  }}
+                  placeholder="wss://example.com/socket"
+                />
+                <button
+                  type="button"
+                  className="btn-icon-small"
+                  onClick={() => setShowWebsocket(!showWebsocket)}
+                >
+                  {showWebsocket ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {customFields.map((field, index) => (
+            <div key={index} className="form-group">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label>Custom Field {index + 1}</label>
+                <button
+                  type="button"
+                  className="btn-icon-small"
+                  onClick={() => removeCustomField(index)}
+                  title="Remove Custom Field"
+                  style={{ marginLeft: 'auto', color: 'var(--text-danger)' }}
+                >
+                  ×
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <input
+                  type="text"
+                  className={validationErrors[`customFieldName${index}`] ? 'error' : ''}
+                  value={field.name}
+                  onChange={(e) => {
+                    updateCustomField(index, 'name', e.target.value);
+                    if (validationErrors[`customFieldName${index}`]) {
+                      setValidationErrors({ ...validationErrors, [`customFieldName${index}`]: false });
+                    }
+                  }}
+                  placeholder="Field name"
+                  style={{ flex: 1 }}
+                />
+                <input
+                  type="text"
+                  className={validationErrors[`customFieldValue${index}`] ? 'error' : ''}
+                  value={field.value}
+                  onChange={(e) => {
+                    updateCustomField(index, 'value', e.target.value);
+                    if (validationErrors[`customFieldValue${index}`]) {
+                      setValidationErrors({ ...validationErrors, [`customFieldValue${index}`]: false });
+                    }
+                  }}
+                  placeholder="Field value"
+                  style={{ flex: 2 }}
+                />
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                <input
+                  type="checkbox"
+                  checked={field.isSensitive || false}
+                  onChange={(e) => updateCustomField(index, 'isSensitive', e.target.checked)}
+                  style={{ width: 'auto', marginBottom: 0 }}
+                />
+                <span>Sensitive field (will be masked)</span>
+              </label>
+            </div>
+          ))}
+
+          {(showApiKeyField || showWebsocketField || customFields.length > 0) && 
+           (!showApiKeyField || !showWebsocketField) && (
+            <div className="form-group" style={{ display: 'flex', gap: '0.5rem' }}>
+              {!showApiKeyField && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowApiKeyField(true)}
+                  style={{ flex: 1 }}
+                >
+                  + Add API Key
+                </button>
+              )}
+              {!showWebsocketField && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowWebsocketField(true)}
+                  style={{ flex: 1 }}
+                >
+                  + Add WebSocket
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={addCustomField}
+                style={{ flex: 1 }}
+              >
+                + Add Custom
+              </button>
             </div>
           )}
 

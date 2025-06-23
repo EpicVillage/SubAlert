@@ -17,8 +17,12 @@ interface APICardProps {
 
 const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, isEditMode = false, isSelected = false, onToggleSelect }) => {
   const [showKey, setShowKey] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [showWebsocket, setShowWebsocket] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(false);
+  const [copiedWebsocket, setCopiedWebsocket] = useState(false);
+  const [copiedCustomFields, setCopiedCustomFields] = useState<Record<number, boolean>>({});
   const [showComparison, setShowComparison] = useState(false);
+  const [showSensitiveFields, setShowSensitiveFields] = useState<Record<number, boolean>>({});
 
   const getDaysLeft = () => {
     if (!api.expiryDate) return null;
@@ -84,15 +88,15 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
               <span>{showKey ? api.apiKey : '••••••••'}</span>
               <div className="api-key-actions">
                 <button 
-                  className={`btn-icon-small ${copied ? 'copied' : ''}`}
+                  className={`btn-icon-small ${copiedKey ? 'copied' : ''}`}
                   onClick={() => {
                     navigator.clipboard.writeText(api.apiKey);
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
+                    setCopiedKey(true);
+                    setTimeout(() => setCopiedKey(false), 2000);
                   }}
-                  title={copied ? "Copied!" : "Copy to clipboard"}
+                  title={copiedKey ? "Copied!" : "Copy to clipboard"}
                 >
-                  {copied ? (
+                  {copiedKey ? (
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
@@ -114,6 +118,93 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
             </div>
           </div>
         )}
+
+        {api.websocketUrl && (
+          <div className="api-field">
+            <label>WebSocket URL:</label>
+            <div className="api-key-display">
+              <span>{showWebsocket ? api.websocketUrl : '••••••••'}</span>
+              <div className="api-key-actions">
+                <button 
+                  className={`btn-icon-small ${copiedWebsocket ? 'copied' : ''}`}
+                  onClick={() => {
+                    if (api.websocketUrl) {
+                      navigator.clipboard.writeText(api.websocketUrl);
+                      setCopiedWebsocket(true);
+                      setTimeout(() => setCopiedWebsocket(false), 2000);
+                    }
+                  }}
+                  title={copiedWebsocket ? "Copied!" : "Copy to clipboard"}
+                >
+                  {copiedWebsocket ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                  )}
+                </button>
+                <button 
+                  className="btn-icon-small"
+                  onClick={() => setShowWebsocket(!showWebsocket)}
+                  title={showWebsocket ? 'Hide' : 'Show'}
+                >
+                  {showWebsocket ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {api.customFields && api.customFields.map((field, index) => (
+          <div key={index} className="api-field">
+            <label>{field.name}:</label>
+            {field.isSensitive ? (
+              <div className="api-key-display">
+                <span>{showSensitiveFields[index] ? field.value : '••••••••'}</span>
+                <div className="api-key-actions">
+                  <button 
+                    className={`btn-icon-small ${copiedCustomFields[index] ? 'copied' : ''}`}
+                    onClick={() => {
+                      navigator.clipboard.writeText(field.value);
+                      setCopiedCustomFields({ ...copiedCustomFields, [index]: true });
+                      setTimeout(() => {
+                        setCopiedCustomFields(prev => ({ ...prev, [index]: false }));
+                      }, 2000);
+                    }}
+                    title={copiedCustomFields[index] ? "Copied!" : "Copy to clipboard"}
+                  >
+                    {copiedCustomFields[index] ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="currentColor" strokeWidth="2"/>
+                      </svg>
+                    )}
+                  </button>
+                  <button 
+                    className="btn-icon-small"
+                    onClick={() => setShowSensitiveFields({
+                      ...showSensitiveFields,
+                      [index]: !showSensitiveFields[index]
+                    })}
+                    title={showSensitiveFields[index] ? 'Hide' : 'Show'}
+                  >
+                    {showSensitiveFields[index] ? '🙈' : '👁️'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <span>{field.value}</span>
+            )}
+          </div>
+        ))}
 
         {api.subscriptionType === 'paid' && (
           <>
