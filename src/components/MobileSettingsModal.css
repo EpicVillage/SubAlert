@@ -265,3 +265,12 @@
 [data-theme="dark"] .mobile-settings-icon {
   background: rgba(255, 255, 255, 0.05);
 }
+
+/* File input styling */
+.file-input-wrapper {
+  margin-top: 0.5rem;
+}
+
+.file-input-wrapper .btn {
+  margin-top: 0;
+}

@@ -34,6 +34,8 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, api
   const [masterPasswordEnabled, setMasterPasswordEnabled] = useState(false);
   const [lockTimeout, setLockTimeout] = useState<LockTimeout>('5min');
   const [showMasterPasswordModal, setShowMasterPasswordModal] = useState<'setup' | 'disable' | 'change' | null>(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [showImportPasswordModal, setShowImportPasswordModal] = useState(false);
 
   useEffect(() => {
     biometric.isAvailable().then(available => {
@@ -145,9 +147,18 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, api
     try {
       await storage.importData(file, password);
       showNotification('success', 'Import Complete', 'Data imported successfully!');
+      setImportFile(null);
+      setShowImportPasswordModal(false);
       setTimeout(() => window.location.reload(), 1000);
     } catch (error) {
-      showNotification('error', 'Import Failed', 'Check the file and password.');
+      const errorMessage = error instanceof Error ? error.message : 'Check the file and password.';
+      if (errorMessage.includes('password protected')) {
+        // File is encrypted, show password modal
+        setImportFile(file);
+        setShowImportPasswordModal(true);
+      } else {
+        showNotification('error', 'Import Failed', errorMessage);
+      }
     }
   };
 
@@ -303,17 +314,25 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, api
 
       <div className="backup-options">
         <h4>Import Data</h4>
-        <input
-          type="file"
-          accept=".json"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              handleImport(file);
-            }
-          }}
-          className="file-input"
-        />
+        <div className="file-input-wrapper">
+          <input
+            type="file"
+            accept=".json"
+            id="import-file"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                handleImport(file);
+              }
+              e.target.value = ''; // Reset input
+            }}
+            className="file-input"
+            style={{ display: 'none' }}
+          />
+          <label htmlFor="import-file" className="btn btn-secondary">
+            Choose File
+          </label>
+        </div>
       </div>
     </div>
   );
@@ -476,6 +495,21 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, api
             apis={apis}
             categories={categories}
             onClose={() => setShowPDFExportModal(false)}
+          />
+        </div>
+      )}
+      
+      {showImportPasswordModal && importFile && (
+        <div style={{ position: 'fixed', zIndex: 10000 }}>
+          <PasswordModal
+            title="Password Required"
+            description="This backup file is encrypted. Enter the password to import."
+            confirmButtonText="Import"
+            onConfirm={(password) => handleImport(importFile, password)}
+            onCancel={() => {
+              setShowImportPasswordModal(false);
+              setImportFile(null);
+            }}
           />
         </div>
       )}
