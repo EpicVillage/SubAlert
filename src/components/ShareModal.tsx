@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import QRCode from 'qrcode';
 import { API } from '../types';
 import { shareService, ShareOptions } from '../utils/shareService';
@@ -141,7 +142,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ subscription, onClose }) => {
     return true;
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal share-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -244,7 +245,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ subscription, onClose }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
