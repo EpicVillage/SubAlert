@@ -48,9 +48,9 @@ export const biometric = {
           ],
           authenticatorSelection: {
             authenticatorAttachment: 'platform',
-            userVerification: 'required',
+            userVerification: 'preferred', // Use 'preferred' for faster auth
           },
-          timeout: 60000,
+          timeout: 10000, // Reduce timeout to 10 seconds
           attestation: 'none',
         },
       };
@@ -93,8 +93,6 @@ export const biometric = {
         return false;
       }
 
-      console.log('Attempting biometric authentication...');
-
       // Generate a random challenge
       const challenge = new Uint8Array(32);
       window.crypto.getRandomValues(challenge);
@@ -108,15 +106,14 @@ export const biometric = {
             type: 'public-key',
             transports: ['internal'],
           }],
-          userVerification: 'required',
-          timeout: 60000,
+          userVerification: 'preferred', // Change to 'preferred' for faster auth
+          timeout: 10000, // Reduce timeout to 10 seconds
         },
       };
 
       // Get credential
       const assertion = await navigator.credentials.get(getCredentialOptions);
       
-      console.log('Biometric authentication successful');
       return !!assertion;
     } catch (error) {
       console.error('Biometric authentication error:', error);

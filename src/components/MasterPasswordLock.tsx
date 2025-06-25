@@ -58,10 +58,8 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
         // The data should already be decrypted in localStorage
         masterPassword.updateLastUnlock();
         
-        // Small delay to ensure localStorage is updated
-        setTimeout(() => {
-          onUnlocked();
-        }, 100);
+        // Call unlock immediately
+        onUnlocked();
       } else {
         // Check if biometric was disabled due to domain mismatch
         if (!biometric.isEnabled()) {
@@ -93,10 +91,8 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
       const success = await masterPassword.unlock(password);
       
       if (success) {
-        // Small delay to ensure localStorage is updated
-        setTimeout(() => {
-          onUnlocked();
-        }, 100);
+        // Call unlock immediately
+        onUnlocked();
       } else {
         setError('Incorrect password');
         setPassword('');
