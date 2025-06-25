@@ -62,7 +62,7 @@ export const biometric = {
         // Store credential ID for future authentication
         // Convert ArrayBuffer to base64 for storage
         const credentialIdArray = new Uint8Array(credential.rawId);
-        const credentialIdBase64 = btoa(String.fromCharCode(...credentialIdArray));
+        const credentialIdBase64 = btoa(String.fromCharCode.apply(null, Array.from(credentialIdArray)));
         
         localStorage.setItem('subalert_biometric_id', credentialIdBase64);
         localStorage.setItem('subalert_biometric_enabled', 'true');
