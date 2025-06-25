@@ -182,8 +182,8 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay">
+      <div className="modal">
         <div className="modal-header">
           <h2>{api ? 'Edit' : 'Add New'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>

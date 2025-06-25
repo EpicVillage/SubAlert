@@ -75,8 +75,8 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({ categories, onSave, o
   const emojiPresets = ['📁', '⭐', '🚀', '💡', '🎯'];
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay">
+      <div className="modal modal-large">
         <div className="modal-header">
           <h2>Manage Categories</h2>
           <button className="close-btn" onClick={onClose}>×</button>
