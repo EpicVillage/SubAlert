@@ -17,6 +17,7 @@ import { AIRecommendations } from './components/AIRecommendations';
 import { AIMenu } from './components/AIMenu';
 import PullToRefresh from './components/PullToRefresh';
 import BulkActionsToolbar from './components/BulkActionsToolbar';
+import InstallPrompt from './components/InstallPrompt';
 import { API, Settings, Category } from './types';
 import { storage } from './utils/storage';
 import { setupNotificationScheduler } from './utils/notificationScheduler';
@@ -287,7 +288,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {isMasterPasswordLocked && (
+        {isMasterPasswordLocked ? (
           <MasterPasswordLock onUnlocked={() => {
             setIsMasterPasswordLocked(false);
             // Reload data after unlock
@@ -295,8 +296,9 @@ function App() {
             setCategories(storage.getCategories());
             setSettings(storage.getSettings());
           }} />
-        )}
-        
+        ) : (
+        <>
+        <InstallPrompt />
         <Header 
           onAddAPI={handleAddAPI}
           onOpenSettings={() => setShowSettingsModal(true)}
@@ -481,6 +483,8 @@ function App() {
             onConfirm={handleBulkExportWithPassword}
             onCancel={() => setShowBulkExportPasswordModal(false)}
           />
+        )}
+        </>
         )}
       </div>
     </Router>
