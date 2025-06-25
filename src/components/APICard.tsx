@@ -225,7 +225,7 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
             {api.cost && (
               <div className="api-field">
                 <label>Cost:</label>
-                <span>${api.cost}/{api.billingCycle === 'yearly' ? 'year' : 'month'}</span>
+                <span>${api.cost}{api.billingCycle === 'one-time' ? '' : `/${api.billingCycle === 'yearly' ? 'year' : 'month'}`}</span>
               </div>
             )}
             {api.expiryDate && (

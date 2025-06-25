@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
   }).length;
 
   const monthlyCost = apis
-    .filter(api => api.subscriptionType === 'paid' && api.cost)
+    .filter(api => api.subscriptionType === 'paid' && api.cost && api.billingCycle !== 'one-time')
     .reduce((total, api) => {
       if (api.billingCycle === 'yearly') {
         return total + (api.cost! / 12);

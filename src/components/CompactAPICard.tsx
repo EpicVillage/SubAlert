@@ -89,7 +89,7 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
         </div>
         {api.subscriptionType === 'paid' && api.cost && (
           <div className="compact-cost">
-            ${api.cost}/{api.billingCycle === 'yearly' ? 'yr' : 'mo'}
+            ${api.cost}{api.billingCycle === 'one-time' ? '' : `/${api.billingCycle === 'yearly' ? 'yr' : 'mo'}`}
           </div>
         )}
       </div>
