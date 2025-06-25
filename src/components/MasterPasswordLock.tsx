@@ -24,7 +24,14 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
     const checkBiometric = async () => {
       const available = await biometric.isAvailable();
       setBiometricAvailable(available);
-      setBiometricEnabled(biometric.isEnabled());
+      
+      // Check if biometric needs re-registration
+      if (biometric.needsReRegistration()) {
+        setBiometricEnabled(false);
+        setError('Biometric authentication was set up on a different domain. Please use your password.');
+      } else {
+        setBiometricEnabled(biometric.isEnabled());
+      }
     };
     
     checkBiometric();
@@ -35,6 +42,13 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
     setError('');
     
     try {
+      // Check HTTPS requirement
+      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+        setError('Biometric authentication requires HTTPS. Please use your password.');
+        setIsAuthenticating(false);
+        return;
+      }
+
       const success = await biometric.authenticate();
       if (success) {
         biometric.updateLastAuth();
@@ -49,8 +63,12 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
           onUnlocked();
         }, 100);
       } else {
-        // Don't show error notification, just show inline error
-        setError('Biometric authentication failed. Please use your password.');
+        // Check if biometric was disabled due to domain mismatch
+        if (!biometric.isEnabled()) {
+          setError('Biometric authentication needs to be set up again. Please use your password and re-enable in settings.');
+        } else {
+          setError('Biometric authentication failed. Please use your password.');
+        }
       }
     } catch (error) {
       console.error('Biometric auth error:', error);

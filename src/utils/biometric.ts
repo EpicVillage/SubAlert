@@ -58,10 +58,16 @@ export const biometric = {
       // Create credential
       const credential = await navigator.credentials.create(createCredentialOptions);
       
-      if (credential) {
+      if (credential && credential instanceof PublicKeyCredential) {
         // Store credential ID for future authentication
-        localStorage.setItem('subalert_biometric_id', (credential as any).id);
+        // Convert ArrayBuffer to base64 for storage
+        const credentialIdArray = new Uint8Array(credential.rawId);
+        const credentialIdBase64 = btoa(String.fromCharCode(...credentialIdArray));
+        
+        localStorage.setItem('subalert_biometric_id', credentialIdBase64);
         localStorage.setItem('subalert_biometric_enabled', 'true');
+        localStorage.setItem('subalert_biometric_domain', window.location.hostname);
+        console.log('Biometric credential registered successfully for domain:', window.location.hostname);
         return true;
       }
       
@@ -75,11 +81,19 @@ export const biometric = {
   // Authenticate with biometric
   authenticate: async (): Promise<boolean> => {
     try {
+      // Check if we're on HTTPS first
+      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+        console.log('Biometric auth requires HTTPS - current protocol:', window.location.protocol);
+        return false;
+      }
+
       const credentialId = localStorage.getItem('subalert_biometric_id');
       if (!credentialId) {
         console.log('No biometric credential found');
         return false;
       }
+
+      console.log('Attempting biometric authentication...');
 
       // Generate a random challenge
       const challenge = new Uint8Array(32);
@@ -102,17 +116,42 @@ export const biometric = {
       // Get credential
       const assertion = await navigator.credentials.get(getCredentialOptions);
       
+      console.log('Biometric authentication successful');
       return !!assertion;
     } catch (error) {
       console.error('Biometric authentication error:', error);
-      // Biometric authentication failed
+      // If the error is because the credential doesn't exist on this domain, clear it
+      if (error instanceof Error && error.name === 'NotAllowedError') {
+        console.log('Credential not valid for this domain, clearing...');
+        biometric.disable();
+      }
       return false;
     }
   },
 
   // Check if biometric is enabled
   isEnabled: (): boolean => {
-    return localStorage.getItem('subalert_biometric_enabled') === 'true';
+    const enabled = localStorage.getItem('subalert_biometric_enabled') === 'true';
+    if (!enabled) return false;
+    
+    // Check if we're on the same domain where biometric was registered
+    const registeredDomain = localStorage.getItem('subalert_biometric_domain');
+    if (registeredDomain && registeredDomain !== window.location.hostname) {
+      console.log('Biometric was registered on different domain:', registeredDomain, 'current:', window.location.hostname);
+      // Don't automatically disable, just return false
+      return false;
+    }
+    
+    return true;
+  },
+
+  // Check if re-registration is needed
+  needsReRegistration: (): boolean => {
+    const enabled = localStorage.getItem('subalert_biometric_enabled') === 'true';
+    if (!enabled) return false;
+    
+    const registeredDomain = localStorage.getItem('subalert_biometric_domain');
+    return registeredDomain !== window.location.hostname;
   },
 
   // Disable biometric authentication
@@ -120,6 +159,7 @@ export const biometric = {
     localStorage.removeItem('subalert_biometric_id');
     localStorage.removeItem('subalert_biometric_enabled');
     localStorage.removeItem('subalert_last_auth');
+    localStorage.removeItem('subalert_biometric_domain');
   },
 
   // Check if authentication is needed (e.g., after 5 minutes of inactivity)
