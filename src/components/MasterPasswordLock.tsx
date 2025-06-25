@@ -32,6 +32,7 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
 
   const handleBiometricAuth = async () => {
     setIsAuthenticating(true);
+    setError('');
     
     try {
       const success = await biometric.authenticate();
@@ -48,10 +49,12 @@ const MasterPasswordLock: React.FC<MasterPasswordLockProps> = ({ onUnlocked }) =
           onUnlocked();
         }, 100);
       } else {
-        showNotification('error', 'Authentication Failed', 'Please try again or use your password.');
+        // Don't show error notification, just show inline error
+        setError('Biometric authentication failed. Please use your password.');
       }
     } catch (error) {
-      showNotification('error', 'Not Available', 'Biometric authentication is not available.');
+      console.error('Biometric auth error:', error);
+      setError('Biometric authentication is not available. Please use your password.');
     }
     
     setIsAuthenticating(false);

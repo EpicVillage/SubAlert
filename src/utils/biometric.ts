@@ -2,6 +2,12 @@
 export const biometric = {
   // Check if biometric authentication is available
   isAvailable: async (): Promise<boolean> => {
+    // Check if we're on HTTPS (required for WebAuthn)
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      console.log('Biometric auth requires HTTPS');
+      return false;
+    }
+
     // Check if Web Authentication API is available
     if (!window.PublicKeyCredential) {
       return false;
@@ -29,7 +35,7 @@ export const biometric = {
           challenge: challenge,
           rp: {
             name: 'SubAlert',
-            id: window.location.hostname,
+            // Don't specify id to use the default (current origin)
           },
           user: {
             id: new TextEncoder().encode('subalert-user'),
@@ -71,6 +77,7 @@ export const biometric = {
     try {
       const credentialId = localStorage.getItem('subalert_biometric_id');
       if (!credentialId) {
+        console.log('No biometric credential found');
         return false;
       }
 
@@ -97,6 +104,7 @@ export const biometric = {
       
       return !!assertion;
     } catch (error) {
+      console.error('Biometric authentication error:', error);
       // Biometric authentication failed
       return false;
     }

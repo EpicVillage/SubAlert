@@ -290,6 +290,7 @@ function App() {
       <div className="App">
         {isMasterPasswordLocked ? (
           <MasterPasswordLock onUnlocked={() => {
+            console.log('Master password unlocked successfully');
             setIsMasterPasswordLocked(false);
             // Reload data after unlock
             setApis(storage.getAPIs());
