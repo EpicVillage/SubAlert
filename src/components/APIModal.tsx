@@ -264,24 +264,29 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
             )}
           </div>
 
-          {!showApiKeyField && !showWebsocketField && customFields.length === 0 && (
+          {/* Always show add buttons section when at least one button is available */}
+          {(!showApiKeyField || !showWebsocketField || true) && (
             <div className="form-group" style={{ display: 'flex', gap: '0.5rem' }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowApiKeyField(true)}
-                style={{ flex: 1 }}
-              >
-                + Add API Key
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowWebsocketField(true)}
-                style={{ flex: 1 }}
-              >
-                + Add WebSocket
-              </button>
+              {!showApiKeyField && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowApiKeyField(true)}
+                  style={{ flex: 1 }}
+                >
+                  + Add API Key
+                </button>
+              )}
+              {!showWebsocketField && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowWebsocketField(true)}
+                  style={{ flex: 1 }}
+                >
+                  + Add WebSocket
+                </button>
+              )}
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -430,39 +435,6 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
             </div>
           ))}
 
-          {(showApiKeyField || showWebsocketField || customFields.length > 0) && 
-           (!showApiKeyField || !showWebsocketField) && (
-            <div className="form-group" style={{ display: 'flex', gap: '0.5rem' }}>
-              {!showApiKeyField && (
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowApiKeyField(true)}
-                  style={{ flex: 1 }}
-                >
-                  + Add API Key
-                </button>
-              )}
-              {!showWebsocketField && (
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowWebsocketField(true)}
-                  style={{ flex: 1 }}
-                >
-                  + Add WebSocket
-                </button>
-              )}
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={addCustomField}
-                style={{ flex: 1 }}
-              >
-                + Add Custom
-              </button>
-            </div>
-          )}
 
           <div className="form-group">
             <label htmlFor="email">Associated Email</label>

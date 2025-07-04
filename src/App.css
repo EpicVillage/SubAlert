@@ -1293,7 +1293,7 @@ form {
   display: flex;
   background: var(--bg-tertiary);
   border-top: 1px solid var(--border-color);
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
@@ -1312,7 +1312,7 @@ form {
   justify-content: center;
   gap: 0.5rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .action-btn::before {
