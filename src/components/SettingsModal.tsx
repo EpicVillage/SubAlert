@@ -8,6 +8,7 @@ import { biometric } from '../utils/biometric';
 import { masterPassword, LockTimeout } from '../utils/masterPassword';
 import { useNotification } from '../hooks/useNotification';
 import ChangePasswordModal from './ChangePasswordModal';
+import ImportOptionsModal from './ImportOptionsModal';
 
 interface SettingsModalProps {
   settings: Settings;
@@ -36,6 +37,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, apis = [], cate
   const [showPDFExportModal, setShowPDFExportModal] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [showImportPasswordModal, setShowImportPasswordModal] = useState(false);
+  const [showImportOptionsModal, setShowImportOptionsModal] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [masterPasswordEnabled, setMasterPasswordEnabled] = useState(false);
@@ -132,11 +134,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, apis = [], cate
         if (data.encrypted === true) {
           setShowImportPasswordModal(true);
         } else {
-          // Regular import
-          await storage.importData(file);
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
+          // Show import options
+          setShowImportOptionsModal(true);
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -154,15 +153,59 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, apis = [], cate
   const handlePasswordImport = async (password: string) => {
     if (importFile) {
       try {
-        await storage.importData(importFile, password);
+        // Verify password is correct first
+        const text = await importFile.text();
+        const data = JSON.parse(text);
+        const { crypto } = await import('../utils/crypto');
+        await crypto.decrypt(data.data, password); // This will throw if password is wrong
+        
+        // Password is correct, store it and show import options
+        setImportPassword(password);
         setShowImportPasswordModal(false);
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
+        setShowImportOptionsModal(true);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         showNotification('error', 'Import Failed', errorMessage);
         setShowImportPasswordModal(false);
+      }
+    }
+  };
+
+  const [importPassword, setImportPassword] = useState<string>('');
+
+  const handleImportWithMode = async (mode: 'merge' | 'replace') => {
+    if (importFile) {
+      try {
+        // Check if file is encrypted
+        const text = await importFile.text();
+        const data = JSON.parse(text);
+        
+        if (data.encrypted === true) {
+          // File is encrypted, use stored password
+          await storage.importData(importFile, importPassword, mode);
+        } else {
+          // Regular import
+          await storage.importData(importFile, undefined, mode);
+        }
+        
+        setShowImportOptionsModal(false);
+        setImportFile(null);
+        setImportPassword('');
+        
+        const message = mode === 'merge' 
+          ? 'Backup merged successfully!' 
+          : 'All data replaced with backup!';
+        showNotification('success', 'Import Successful', message);
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        showNotification('error', 'Import Failed', errorMessage);
+        setShowImportOptionsModal(false);
+        setImportFile(null);
+        setImportPassword('');
       }
     }
   };
@@ -609,10 +652,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, apis = [], cate
         <PasswordModal
           title="Enter Password"
           description="This backup file is password protected. Enter the password to import."
-          confirmButtonText="Import"
+          confirmButtonText="Next"
           onConfirm={handlePasswordImport}
           onCancel={() => setShowImportPasswordModal(false)}
           showConfirmPassword={false}
+        />
+      )}
+      
+      {showImportOptionsModal && (
+        <ImportOptionsModal
+          onImport={handleImportWithMode}
+          onCancel={() => {
+            setShowImportOptionsModal(false);
+            setImportFile(null);
+          }}
+          isEncrypted={importFile ? false : true}
         />
       )}
       

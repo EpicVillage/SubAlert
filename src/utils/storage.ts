@@ -109,7 +109,7 @@ export const storage = {
     }
   },
 
-  importData: async (file: File, password?: string): Promise<void> => {
+  importData: async (file: File, password?: string, mode: 'merge' | 'replace' = 'replace'): Promise<void> => {
     try {
       const text = await file.text();
       let data = JSON.parse(text);
@@ -135,20 +135,53 @@ export const storage = {
       
       // Import APIs
       if (data.apis && Array.isArray(data.apis)) {
-        storage.saveAPIs(data.apis);
+        if (mode === 'merge') {
+          // Merge mode: Add non-duplicate APIs
+          const existingAPIs = storage.getAPIs();
+          const existingIds = new Set(existingAPIs.map(api => api.id));
+          
+          // Also check for duplicates by service name + email combination
+          const existingKeys = new Set(
+            existingAPIs.map(api => `${api.serviceName.toLowerCase()}_${api.email.toLowerCase()}`)
+          );
+          
+          const newAPIs = data.apis.filter((api: API) => {
+            const key = `${api.serviceName.toLowerCase()}_${api.email.toLowerCase()}`;
+            return !existingIds.has(api.id) && !existingKeys.has(key);
+          });
+          
+          if (newAPIs.length > 0) {
+            storage.saveAPIs([...existingAPIs, ...newAPIs]);
+          }
+        } else {
+          // Replace mode: Replace all APIs
+          storage.saveAPIs(data.apis);
+        }
       }
       
-      // Import settings
+      // Import settings (always replace for settings)
       if (data.settings) {
         storage.saveSettings(data.settings);
       }
       
-      // Import categories (use defaults if not present for backward compatibility)
+      // Import categories
       if (data.categories && Array.isArray(data.categories)) {
-        storage.saveCategories(data.categories);
+        if (mode === 'merge') {
+          // Merge categories
+          const existingCategories = storage.getCategories();
+          const existingIds = new Set(existingCategories.map(cat => cat.id));
+          const newCategories = data.categories.filter((cat: Category) => !existingIds.has(cat.id) && cat.isCustom);
+          
+          if (newCategories.length > 0) {
+            storage.saveCategories([...existingCategories, ...newCategories]);
+          }
+        } else {
+          // Replace categories
+          storage.saveCategories(data.categories);
+        }
       }
       
-      // Import AI settings if present
+      // Import AI settings if present (always replace)
       if (data.aiSettings) {
         localStorage.setItem('subalert_ai_settings', JSON.stringify(data.aiSettings));
       }

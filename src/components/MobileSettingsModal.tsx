@@ -9,6 +9,7 @@ import BottomSheet from './BottomSheet';
 import PasswordModal from './PasswordModal';
 import PDFExportModal from './PDFExportModal';
 import ChangePasswordModal from './ChangePasswordModal';
+import ImportOptionsModal from './ImportOptionsModal';
 import './MobileSettingsModal.css';
 
 interface MobileSettingsModalProps {
@@ -36,6 +37,8 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, api
   const [showMasterPasswordModal, setShowMasterPasswordModal] = useState<'setup' | 'disable' | 'change' | null>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [showImportPasswordModal, setShowImportPasswordModal] = useState(false);
+  const [showImportOptionsModal, setShowImportOptionsModal] = useState(false);
+  const [importPassword, setImportPassword] = useState<string>('');
 
   useEffect(() => {
     biometric.isAvailable().then(available => {
@@ -143,21 +146,80 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, api
     setShowMasterPasswordModal(null);
   };
 
-  const handleImport = async (file: File, password?: string) => {
+  const handleImport = async (file: File) => {
     try {
-      await storage.importData(file, password);
-      showNotification('success', 'Import Complete', 'Data imported successfully!');
-      setImportFile(null);
-      setShowImportPasswordModal(false);
-      setTimeout(() => window.location.reload(), 1000);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Check the file and password.';
-      if (errorMessage.includes('password protected')) {
-        // File is encrypted, show password modal
-        setImportFile(file);
+      setImportFile(file);
+      
+      // Check if file is encrypted
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      if (data.encrypted === true) {
         setShowImportPasswordModal(true);
       } else {
+        // Show import options
+        setShowImportOptionsModal(true);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Invalid file format';
+      showNotification('error', 'Import Failed', errorMessage);
+    }
+  };
+
+  const handlePasswordImport = async (password: string) => {
+    if (importFile) {
+      try {
+        // Verify password is correct first
+        const text = await importFile.text();
+        const data = JSON.parse(text);
+        const { crypto } = await import('../utils/crypto');
+        await crypto.decrypt(data.data, password); // This will throw if password is wrong
+        
+        // Password is correct, store it and show import options
+        setImportPassword(password);
+        setShowImportPasswordModal(false);
+        setShowImportOptionsModal(true);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         showNotification('error', 'Import Failed', errorMessage);
+        setShowImportPasswordModal(false);
+      }
+    }
+  };
+
+  const handleImportWithMode = async (mode: 'merge' | 'replace') => {
+    if (importFile) {
+      try {
+        // Check if file is encrypted
+        const text = await importFile.text();
+        const data = JSON.parse(text);
+        
+        if (data.encrypted === true) {
+          // File is encrypted, use stored password
+          await storage.importData(importFile, importPassword, mode);
+        } else {
+          // Regular import
+          await storage.importData(importFile, undefined, mode);
+        }
+        
+        setShowImportOptionsModal(false);
+        setImportFile(null);
+        setImportPassword('');
+        
+        const message = mode === 'merge' 
+          ? 'Backup merged successfully!' 
+          : 'All data replaced with backup!';
+        showNotification('success', 'Import Successful', message);
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        showNotification('error', 'Import Failed', errorMessage);
+        setShowImportOptionsModal(false);
+        setImportFile(null);
+        setImportPassword('');
       }
     }
   };
@@ -504,11 +566,25 @@ const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({ settings, api
           <PasswordModal
             title="Password Required"
             description="This backup file is encrypted. Enter the password to import."
-            confirmButtonText="Import"
-            onConfirm={(password) => handleImport(importFile, password)}
+            confirmButtonText="Next"
+            onConfirm={handlePasswordImport}
             onCancel={() => {
               setShowImportPasswordModal(false);
               setImportFile(null);
+            }}
+            showConfirmPassword={false}
+          />
+        </div>
+      )}
+      
+      {showImportOptionsModal && (
+        <div style={{ position: 'fixed', zIndex: 10000 }}>
+          <ImportOptionsModal
+            onImport={handleImportWithMode}
+            onCancel={() => {
+              setShowImportOptionsModal(false);
+              setImportFile(null);
+              setImportPassword('');
             }}
           />
         </div>
