@@ -25,6 +25,7 @@ import { useNotification } from './hooks/useNotification';
 import { useTheme } from './hooks/useTheme';
 import { useIsTouchDevice } from './hooks/useTouch';
 import { masterPassword } from './utils/masterPassword';
+import { Analytics } from '@vercel/analytics/react';
 import './App.css';
 
 function App() {
@@ -486,6 +487,7 @@ function App() {
         )}
         </>
         )}
+        <Analytics />
       </div>
     </Router>
   );
