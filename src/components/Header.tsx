@@ -38,20 +38,29 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
               <button className="btn btn-primary" onClick={onAddAPI}>
                 + Add
               </button>
-              <button 
-                className={`btn ${isEditMode ? 'btn-primary' : 'btn-secondary'}`} 
-                onClick={onToggleEditMode}
-              >
-                {isEditMode ? '✓ Done' : '✏️ Edit'}
-              </button>
-              {!isTouchDevice && isEditMode && onSelectAll && (
-                <button className="btn btn-link" onClick={onSelectAll}>
-                  {selectedCount > 0 ? 'Deselect All' : 'Select All'}
-                </button>
-              )}
-              {isEditMode && (
-                <button className="btn btn-secondary" onClick={onOpenCategories}>
-                  🏷️ Categories
+              {isEditMode ? (
+                <div className="edit-mode-buttons">
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={onToggleEditMode}
+                  >
+                    ✓ Done
+                  </button>
+                  {!isTouchDevice && onSelectAll && (
+                    <button className="btn btn-link" onClick={onSelectAll}>
+                      {selectedCount > 0 ? 'Deselect All' : 'Select All'}
+                    </button>
+                  )}
+                  <button className="btn btn-secondary" onClick={onOpenCategories}>
+                    🏷️ Categories
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={onToggleEditMode}
+                >
+                  ✏️ Edit
                 </button>
               )}
             </>

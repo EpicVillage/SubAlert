@@ -123,6 +123,16 @@ body {
   align-items: center;
 }
 
+.edit-mode-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: var(--bg-tertiary);
+}
+
 /* Buttons */
 .btn {
   padding: 0.5rem 1rem;
