@@ -32,6 +32,7 @@ const ListView: React.FC<ListViewProps> = ({
   const [internalExpandedRows, setInternalExpandedRows] = useState<Set<string>>(new Set());
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
   const [copiedApiKeys, setCopiedApiKeys] = useState<Record<string, boolean>>({});
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
   
   // Use external state if provided, otherwise use internal state
   const expandedRows = externalExpandedRows ?? internalExpandedRows;
@@ -389,7 +390,35 @@ const ListView: React.FC<ListViewProps> = ({
                         )}
                         {api.notes && (
                           <div className="detail-item">
-                            <strong>Notes:</strong> {api.notes}
+                            <strong>Notes:</strong>
+                            <div className="api-notes-container" style={{ display: 'inline-block', marginLeft: '0.5rem' }}>
+                              <span className={`api-notes ${!expandedNotes.has(api.id) ? 'api-notes-collapsed' : ''}`}>
+                                {api.notes!.split('\n').map((line, index, array) => (
+                                  <React.Fragment key={index}>
+                                    {line}
+                                    {index < array.length - 1 && <br />}
+                                  </React.Fragment>
+                                ))}
+                              </span>
+                              {api.notes!.split('\n').length > 3 && (
+                                <button 
+                                  className="notes-toggle-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const newExpanded = new Set(expandedNotes);
+                                    if (newExpanded.has(api.id)) {
+                                      newExpanded.delete(api.id);
+                                    } else {
+                                      newExpanded.add(api.id);
+                                    }
+                                    setExpandedNotes(newExpanded);
+                                  }}
+                                  style={{ marginLeft: '0.5rem' }}
+                                >
+                                  {expandedNotes.has(api.id) ? 'Show less' : 'Show more'}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         )}
                         {api.autoRenews !== undefined && api.subscriptionType === 'paid' && (

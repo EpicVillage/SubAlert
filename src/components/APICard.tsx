@@ -25,6 +25,7 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
   const [showComparison, setShowComparison] = useState(false);
   const [showSensitiveFields, setShowSensitiveFields] = useState<Record<number, boolean>>({});
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isNotesExpanded, setIsNotesExpanded] = useState(false);
 
   const getDaysLeft = () => {
     if (!api.expiryDate) return null;
@@ -262,7 +263,24 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
         {api.notes && (
           <div className="api-field">
             <label>Notes:</label>
-            <p className="api-notes">{api.notes}</p>
+            <div className="api-notes-container">
+              <p className={`api-notes ${!isNotesExpanded ? 'api-notes-collapsed' : ''}`}>
+                {api.notes!.split('\n').map((line, index, array) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    {index < array.length - 1 && <br />}
+                  </React.Fragment>
+                ))}
+              </p>
+              {api.notes!.split('\n').length > 3 && (
+                <button 
+                  className="notes-toggle-btn"
+                  onClick={() => setIsNotesExpanded(!isNotesExpanded)}
+                >
+                  {isNotesExpanded ? 'Show less' : 'Show more'}
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

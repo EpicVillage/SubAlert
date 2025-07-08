@@ -519,11 +519,41 @@ body {
   gap: 0.25rem;
 }
 
+.api-notes-container {
+  position: relative;
+}
+
 .api-notes {
   margin: 0;
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.api-notes-collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notes-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  margin-top: 0.25rem;
+  transition: opacity 0.2s ease;
+}
+
+.notes-toggle-btn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }
 
 .api-card-actions {
