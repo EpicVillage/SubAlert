@@ -221,11 +221,11 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
           <div className="form-group">
             <label htmlFor="website">Website</label>
             <input
-              type="url"
+              type="text"
               id="website"
               value={formData.website}
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-              placeholder="https://example.com"
+              placeholder="example.com"
             />
           </div>
 
@@ -572,7 +572,7 @@ const APIModal: React.FC<APIModalProps> = ({ api, categories, onSave, onClose })
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
-              {api ? 'Save Changes' : 'Add API'}
+              {api ? 'Save Changes' : 'Add'}
             </button>
           </div>
         </form>
