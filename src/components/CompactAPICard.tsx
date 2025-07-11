@@ -81,7 +81,18 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
             <span className="category-emoji" style={{ fontSize: '1.25rem' }}>{category.emoji}</span>
           )}
           <h3 className="compact-service-name" title={api.serviceName}>
-            {api.serviceName}
+            {api.website ? (
+              <a 
+                href={api.website.startsWith('http') ? api.website : `https://${api.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="subscription-title-link"
+              >
+                {api.serviceName}
+              </a>
+            ) : (
+              api.serviceName
+            )}
           </h3>
           {api.subscriptionType === 'free' && (
             <span className="badge-free-compact">FREE</span>

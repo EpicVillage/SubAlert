@@ -468,6 +468,17 @@ body {
   color: var(--text-primary);
 }
 
+.subscription-title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.subscription-title-link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
 .category-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;

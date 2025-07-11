@@ -78,7 +78,18 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
                 }}
               />
             )}
-            {api.serviceName}
+            {api.website ? (
+              <a 
+                href={api.website.startsWith('http') ? api.website : `https://${api.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="subscription-title-link"
+              >
+                {api.serviceName}
+              </a>
+            ) : (
+              api.serviceName
+            )}
           </h3>
         </div>
         <span 
