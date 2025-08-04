@@ -114,6 +114,27 @@ function App() {
     setShowAPIModal(true);
   };
 
+  const handleAddDivider = () => {
+    const divider: API = {
+      id: `divider-${Date.now()}`,
+      type: 'divider',
+      serviceName: 'Section',
+      apiKey: '',
+      email: '',
+      subscriptionType: 'free',
+      category: 'other',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    const newApis = [...apis, divider];
+    setApis(newApis);
+    storage.saveAPIs(newApis);
+    
+    // Update the order to put the new divider at the end
+    const apiOrder = newApis.map(api => api.id);
+    localStorage.setItem('apiOrder', JSON.stringify(apiOrder));
+  };
+
   const handleEditAPI = (api: API) => {
     setEditingAPI(api);
     setShowAPIModal(true);
@@ -146,7 +167,9 @@ function App() {
   };
 
   const handleUpdateAPI = (api: API) => {
-    setApis(apis.map(a => a.id === api.id ? api : a));
+    const updatedApis = apis.map(a => a.id === api.id ? api : a);
+    setApis(updatedApis);
+    storage.saveAPIs(updatedApis);
   };
 
   const handleReorderAPIs = (reorderedAPIs: API[]) => {
@@ -310,6 +333,7 @@ function App() {
         <InstallPrompt />
         <Header 
           onAddAPI={handleAddAPI}
+          onAddDivider={handleAddDivider}
           onOpenSettings={() => setShowSettingsModal(true)}
           theme={theme}
           onToggleTheme={toggleTheme}

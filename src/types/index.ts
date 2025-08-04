@@ -14,6 +14,7 @@ export interface CustomField {
 
 export interface API {
   id: string;
+  type?: 'subscription' | 'divider'; // Type of card, defaults to 'subscription'
   serviceName: string;
   serviceDescription?: string; // What does this service do?
   website?: string; // Service website URL

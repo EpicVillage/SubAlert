@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
   onAddAPI: () => void;
+  onAddDivider?: () => void;
   onOpenSettings: () => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
@@ -15,7 +16,7 @@ interface HeaderProps {
   onSelectAll?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories, onOpenAI, selectedCount = 0, onSelectAll }) => {
+const Header: React.FC<HeaderProps> = ({ onAddAPI, onAddDivider, onOpenSettings, theme, onToggleTheme, isEditMode, onToggleEditMode, onOpenCategories, onOpenAI, selectedCount = 0, onSelectAll }) => {
   const isTouchDevice = useIsTouchDevice();
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,6 +47,11 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onOpenSettings, theme, onTogg
                   >
                     ✓ Done
                   </button>
+                  {onAddDivider && (
+                    <button className="btn btn-secondary" onClick={onAddDivider}>
+                      ➖ Add Divider
+                    </button>
+                  )}
                   {!isTouchDevice && onSelectAll && (
                     <button className="btn btn-link" onClick={onSelectAll}>
                       {selectedCount > 0 ? 'Deselect All' : 'Select All'}

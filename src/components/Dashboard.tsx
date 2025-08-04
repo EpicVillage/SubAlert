@@ -3,6 +3,7 @@ import { API, Category } from '../types';
 import APICard from './APICard';
 import CompactAPICard from './CompactAPICard';
 import MobileAPICard from './MobileAPICard';
+import DividerCard from './DividerCard';
 import CategoryView from './CategoryView';
 import ListView from './ListView';
 import Stats from './Stats';
@@ -92,6 +93,7 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
       return total + api.cost!;
     }, 0);
 
+
   // Drag and drop handlers
   const handleDragStart = (e: React.DragEvent, api: API, index: number) => {
     setDraggedItem(api);
@@ -113,28 +115,33 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
     e.preventDefault();
     const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
     
-    if (dragIndex !== dropIndex && draggedItem) {
+    if (draggedItem && draggedItem.type !== 'divider' && dragIndex !== dropIndex) {
       const newFilteredAPIs = [...filteredAPIs];
+      
+      // Remove the dragged item
       newFilteredAPIs.splice(dragIndex, 1);
-      newFilteredAPIs.splice(dropIndex, 0, draggedItem);
+      
+      // Calculate the new index after removal
+      let targetIndex = dropIndex;
+      if (dragIndex < dropIndex) {
+        targetIndex--;
+      }
+      
+      // Insert at the new position
+      newFilteredAPIs.splice(targetIndex, 0, draggedItem);
       setFilteredAPIs(newFilteredAPIs);
       
       // If we're viewing all items (no filter), update the global order
       if (filterType === 'all' && searchTerm === '' && onReorderAPIs) {
-        // Create a new ordered array based on all APIs
         const allAPIsMap = new Map(apis.map(api => [api.id, api]));
         const orderedAPIs: API[] = [];
         
-        // First add the APIs in the new order
         newFilteredAPIs.forEach(api => {
           orderedAPIs.push(api);
           allAPIsMap.delete(api.id);
         });
         
-        // Then add any remaining APIs that weren't in the filtered list
         allAPIsMap.forEach(api => orderedAPIs.push(api));
-        
-        // Call the reorder handler
         onReorderAPIs(orderedAPIs);
       }
     }
@@ -268,18 +275,111 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
 
       {viewMode === 'grid' ? (
         <div className={`api-grid ${isCompactMode ? 'compact-grid' : ''}`}>
-          {filteredAPIs.map((api, index) => (
-            <div
-              key={api.id}
-              draggable={isEditMode}
-              onDragStart={isEditMode ? (e) => handleDragStart(e, api, index) : undefined}
-              onDragEnd={isEditMode ? handleDragEnd : undefined}
-              onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
-              onDragLeave={isEditMode ? handleDragLeave : undefined}
-              onDrop={isEditMode ? (e) => handleDrop(e, index) : undefined}
-              className={`draggable-card-wrapper ${dragOverIndex === index ? 'drag-over' : ''}`}
-            >
-              {isMobile && !isCompactMode ? (
+          {(() => {
+            const itemsWithPlaceholders: (API | { id: string; type: 'placeholder'; index: number })[] = [];
+            let currentSectionStart = 0;
+            
+            filteredAPIs.forEach((api, index) => {
+              if (api.type === 'divider') {
+                // Add placeholders to fill the previous section
+                if (isEditMode) {
+                  const sectionItems = itemsWithPlaceholders.slice(currentSectionStart);
+                  const nonDividerCount = sectionItems.filter(item => item.type !== 'divider' && item.type !== 'placeholder').length;
+                  const gridColumns = isCompactMode ? 5 : 3; // Approximate columns based on mode
+                  const placeholdersNeeded = nonDividerCount > 0 ? (gridColumns - (nonDividerCount % gridColumns)) % gridColumns : gridColumns;
+                  
+                  for (let i = 0; i < placeholdersNeeded; i++) {
+                    itemsWithPlaceholders.push({
+                      id: `placeholder-${index}-${i}`,
+                      type: 'placeholder',
+                      index: index
+                    });
+                  }
+                }
+                
+                itemsWithPlaceholders.push(api);
+                currentSectionStart = itemsWithPlaceholders.length;
+                
+                // Check if this is the last item or if next item is also a divider
+                const isLastItem = index === filteredAPIs.length - 1;
+                const nextIsAlsoDivider = index < filteredAPIs.length - 1 && filteredAPIs[index + 1].type === 'divider';
+                
+                // Add placeholders for empty section after divider
+                if (isEditMode && (isLastItem || nextIsAlsoDivider)) {
+                  const gridColumns = isCompactMode ? 5 : 3;
+                  for (let i = 0; i < gridColumns; i++) {
+                    itemsWithPlaceholders.push({
+                      id: `placeholder-after-${index}-${i}`,
+                      type: 'placeholder',
+                      index: index + 1
+                    });
+                  }
+                  currentSectionStart = itemsWithPlaceholders.length;
+                }
+              } else {
+                itemsWithPlaceholders.push(api);
+              }
+            });
+            
+            // Add placeholders for the last section
+            if (isEditMode) {
+              const sectionItems = itemsWithPlaceholders.slice(currentSectionStart);
+              const nonDividerCount = sectionItems.filter(item => item.type !== 'divider' && item.type !== 'placeholder').length;
+              const gridColumns = isCompactMode ? 5 : 3;
+              const placeholdersNeeded = nonDividerCount > 0 ? (gridColumns - (nonDividerCount % gridColumns)) % gridColumns : gridColumns;
+              
+              for (let i = 0; i < placeholdersNeeded; i++) {
+                itemsWithPlaceholders.push({
+                  id: `placeholder-end-${i}`,
+                  type: 'placeholder',
+                  index: filteredAPIs.length
+                });
+              }
+            }
+            
+            return itemsWithPlaceholders.map((item, displayIndex) => {
+              if (item.type === 'placeholder') {
+                return (
+                  <div
+                    key={item.id}
+                    className="placeholder-card"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setDragOverIndex(item.index);
+                    }}
+                    onDragLeave={() => setDragOverIndex(null)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      handleDrop(e, item.index);
+                    }}
+                  />
+                );
+              }
+              
+              const api = item as API;
+              const actualIndex = filteredAPIs.findIndex(a => a.id === api.id);
+              
+              return (
+                <div
+                  key={api.id}
+                  draggable={isEditMode && api.type !== 'divider'}
+                  onDragStart={isEditMode ? (e) => handleDragStart(e, api, actualIndex) : undefined}
+                  onDragEnd={isEditMode ? handleDragEnd : undefined}
+                  onDragOver={isEditMode ? (e) => handleDragOver(e, actualIndex) : undefined}
+                  onDragLeave={isEditMode ? handleDragLeave : undefined}
+                  onDrop={isEditMode ? (e) => handleDrop(e, actualIndex) : undefined}
+                  className={`draggable-card-wrapper ${dragOverIndex === actualIndex ? 'drag-over' : ''}`}
+                >
+              {api.type === 'divider' ? (
+                <DividerCard
+                  label={api.serviceName}
+                  api={api}
+                  isEditMode={isEditMode}
+                  onEdit={(updatedApi) => onUpdateAPI?.(updatedApi)}
+                  onDelete={() => onDeleteAPI(api.id)}
+                  isCompact={isCompactMode}
+                />
+              ) : isMobile && !isCompactMode ? (
                 <MobileAPICard
                   api={api}
                   categories={categories}
@@ -311,7 +411,9 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
                 />
               )}
             </div>
-          ))}
+              );
+            });
+          })()}
           {filteredAPIs.length === 0 && (
             <div className="empty-state">
               <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -3377,7 +3377,7 @@ form {
   position: relative;
 }
 
-.draggable-card-wrapper.drag-over::before {
+.draggable-card-wrapper:not(:has(.divider-card)).drag-over::before {
   content: '';
   position: absolute;
   inset: -4px;
@@ -3410,3 +3410,167 @@ form {
 .draggable-card-wrapper:active {
   opacity: 0.5;
 }
+
+/* Divider Card Styles */
+.divider-card {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  position: relative;
+  user-select: none;
+}
+
+.divider-card.compact {
+  padding: 0.5rem 0;
+  gap: 0.75rem;
+}
+
+.divider-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  position: relative;
+}
+
+.divider-line.left {
+  background: linear-gradient(to right, transparent, var(--border-color));
+}
+
+.divider-line.right {
+  background: linear-gradient(to left, transparent, var(--border-color));
+}
+
+.divider-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  white-space: nowrap;
+}
+
+.divider-label-input {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 1rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-sm);
+  outline: none;
+  min-width: 120px;
+  text-align: center;
+}
+
+.divider-actions {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 0.25rem;
+  background: var(--bg-primary);
+  padding: 0.125rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.divider-action-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  font-size: 16px;
+}
+
+.divider-action-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+.divider-action-btn.delete {
+  color: var(--danger);
+}
+
+.divider-action-btn.delete:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+/* Ensure divider spans full width in all grid layouts */
+.api-grid .draggable-card-wrapper:has(.divider-card) {
+  grid-column: 1 / -1;
+}
+
+.compact-grid .draggable-card-wrapper:has(.divider-card) {
+  grid-column: 1 / -1;
+  display: block;
+  height: auto;
+}
+
+/* Make divider consistent in compact mode */
+.compact-grid .divider-card {
+  width: 100%;
+}
+
+/* Improve drag zones - make area below divider droppable */
+.draggable-card-wrapper:has(.divider-card) {
+  position: relative;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Hide the normal drag-over border for dividers */
+.draggable-card-wrapper:has(.divider-card).drag-over {
+  transform: none;
+}
+
+.draggable-card-wrapper:has(.divider-card).drag-over::after {
+  display: none;
+}
+
+/* Placeholder cards for drag and drop */
+.placeholder-card {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius);
+  background: transparent;
+  min-height: 180px;
+  opacity: 0;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+/* Show placeholders in edit mode */
+.api-grid:has(.draggable-card-wrapper[draggable="true"]) .placeholder-card {
+  opacity: 0.3;
+  pointer-events: all;
+}
+
+.placeholder-card:hover {
+  opacity: 0.5;
+  border-color: var(--primary);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+/* Compact mode placeholder height */
+.compact-grid .placeholder-card {
+  min-height: auto;
+  aspect-ratio: 1.5;
+}
+
+
+
