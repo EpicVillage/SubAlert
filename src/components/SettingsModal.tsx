@@ -570,7 +570,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ settings, apis = [], cate
                     <div className="security-info">
                       <h4>How it works</h4>
                       <ul>
-                        <li>SubAlert will lock after 5 minutes of inactivity</li>
+                        <li>SubAlerts will lock after 5 minutes of inactivity</li>
                         <li>Use your device's biometric authentication to unlock</li>
                         <li>Your biometric data never leaves your device</li>
                         <li>Master password encrypts all data with AES-256-GCM</li>

@@ -1,8 +1,8 @@
-# SubAlert 🔔
+# SubAlerts 🔔
 
 A modern subscription and API key tracker with expiry notifications. Never forget to renew your subscriptions or rotate your API keys again!
 
-![SubAlert Preview](https://img.shields.io/badge/PWA-Ready-5A9FD4?style=flat-square&logo=pwa)
+![SubAlerts Preview](https://img.shields.io/badge/PWA-Ready-5A9FD4?style=flat-square&logo=pwa)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9+-3178C6?style=flat-square&logo=typescript)
 ![React](https://img.shields.io/badge/React-19.1+-61DAFB?style=flat-square&logo=react)
 
@@ -31,7 +31,7 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 ### PDF Reports
 - 📄 **5 Report Types** - Summary, Detailed, Financial, Upcoming Renewals, Category Breakdown
 - 🎨 **Professional Design** - Clean layouts with charts and visual analytics
-- 💧 **Watermarked** - SubAlert branding on each page
+- 💧 **Watermarked** - SubAlerts branding on each page
 - 📊 **Visual Charts** - Cost distribution and category breakdowns
 - 🔐 **Privacy Focused** - All generation happens locally in your browser
 
@@ -65,7 +65,7 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 
 ### Visual Design
 - 🎨 **Glassmorphic UI** - Modern, translucent design elements
-- 🖼️ **Custom Branding** - Beautiful SubAlert logo with Instink font
+- 🖼️ **Custom Branding** - Beautiful SubAlerts logo with Instink font
 - 🌈 **Gradient Text** - Eye-catching green to navy gradient logo
 - 🌓 **Theme-Aware** - Adaptive design for light/dark modes
 - 📱 **Responsive Design** - Works perfectly on all devices
@@ -87,8 +87,8 @@ A modern subscription and API key tracker with expiry notifications. Never forge
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/subalert.git
-cd subalert
+git clone https://github.com/yourusername/subalerts.git
+cd subalerts
 ```
 
 2. Install dependencies:
@@ -144,7 +144,7 @@ vercel
 
 ## 🤖 AI Integration
 
-SubAlert supports AI-powered subscription analysis using your own API keys. No data is sent to our servers - everything runs locally in your browser.
+SubAlerts supports AI-powered subscription analysis using your own API keys. No data is sent to our servers - everything runs locally in your browser.
 
 ### Supported Providers:
 - **OpenAI** (GPT-3.5-Turbo)
@@ -378,7 +378,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Logo designed with care for the SubAlert brand
+- Logo designed with care for the SubAlerts brand
 - Instink font for beautiful typography
 - Icons from [Lucide](https://lucide.dev/)
 - Date handling by [date-fns](https://date-fns.org/)

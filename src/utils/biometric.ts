@@ -34,13 +34,13 @@ export const biometric = {
         publicKey: {
           challenge: challenge,
           rp: {
-            name: 'SubAlert',
+            name: 'SubAlerts',
             // Don't specify id to use the default (current origin)
           },
           user: {
             id: new TextEncoder().encode('subalert-user'),
-            name: 'SubAlert User',
-            displayName: 'SubAlert User',
+            name: 'SubAlerts User',
+            displayName: 'SubAlerts User',
           },
           pubKeyCredParams: [
             { alg: -7, type: 'public-key' }, // ES256

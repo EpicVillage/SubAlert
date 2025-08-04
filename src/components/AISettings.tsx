@@ -56,7 +56,7 @@ export const AISettings: React.FC<AISettingsProps> = ({ onClose }) => {
             <div className="modal-icon">🤖</div>
             <div>
               <h2>AI Configuration</h2>
-              <p className="modal-subtitle">Power up SubAlert with AI insights</p>
+              <p className="modal-subtitle">Power up SubAlerts with AI insights</p>
             </div>
           </div>
           <button className="close-btn" onClick={onClose}>×</button>

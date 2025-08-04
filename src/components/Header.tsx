@@ -28,10 +28,10 @@ const Header: React.FC<HeaderProps> = ({ onAddAPI, onAddDivider, onOpenSettings,
         <div className="header-brand">
           <img 
             src={theme === 'dark' ? "/subalert-logo-light.png" : "/subalert-logo.png"} 
-            alt="SubAlert Logo" 
+            alt="SubAlerts Logo" 
             className="header-logo" 
           />
-          <h1>SubAlert</h1>
+          <h1>SubAlerts</h1>
         </div>
         <div className="header-actions">
           {!isCalendarView && (

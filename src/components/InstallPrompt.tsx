@@ -104,7 +104,7 @@ const InstallPrompt: React.FC = () => {
         <div className="ios-install-content">
           <button className="ios-close-btn" onClick={handleIOSClose}>×</button>
           <div className="ios-install-icon">📱</div>
-          <h3>Install SubAlert</h3>
+          <h3>Install SubAlerts</h3>
           <p>Install this app on your iPhone:</p>
           <ol>
             <li>Tap the share button <span className="ios-share-icon">
@@ -127,7 +127,7 @@ const InstallPrompt: React.FC = () => {
       <div className="install-prompt-banner">
         <div className="install-prompt-content">
           <div className="install-prompt-text">
-            <strong>Install SubAlert</strong>
+            <strong>Install SubAlerts</strong>
             <span>Add to your home screen for quick access</span>
           </div>
           <button className="install-button" onClick={handleInstallClick}>

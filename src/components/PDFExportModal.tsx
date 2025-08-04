@@ -19,7 +19,7 @@ const PDFExportModal: React.FC<PDFExportModalProps> = ({ apis, categories, onClo
     includeCharts: true,
     includeNotes: true,
     pageSize: 'a4',
-    title: 'SubAlert Report',
+    title: 'SubAlerts Report',
     subtitle: ''
   });
   

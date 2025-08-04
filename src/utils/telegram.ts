@@ -26,7 +26,7 @@ export const telegram = {
       const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
       await axios.post(url, {
         chat_id: chatId,
-        text: '✅ SubAlert connected successfully!',
+        text: '✅ SubAlerts connected successfully!',
         parse_mode: 'HTML'
       });
       return true;

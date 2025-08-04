@@ -17,11 +17,11 @@ export class ICalGenerator {
     this.lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//SubAlert//Subscription Calendar//EN',
+      'PRODID:-//SubAlerts//Subscription Calendar//EN',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
-      `X-WR-CALNAME:SubAlert Subscriptions`,
-      `X-WR-CALDESC:Subscription renewal dates from SubAlert`
+      `X-WR-CALNAME:SubAlerts Subscriptions`,
+      `X-WR-CALDESC:Subscription renewal dates from SubAlerts`
     ];
   }
   
