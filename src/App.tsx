@@ -75,7 +75,7 @@ function App() {
   const [editingAPI, setEditingAPI] = useState<API | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string | null; type?: 'subscription' | 'divider' }>({ show: false, id: null });
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const [showBulkExportOptions, setShowBulkExportOptions] = useState(false);
   const [showBulkExportPasswordModal, setShowBulkExportPasswordModal] = useState(false);
@@ -202,7 +202,9 @@ function App() {
   };
 
   const handleDeleteAPI = (id: string) => {
-    setDeleteConfirm({ show: true, id });
+    const api = apis.find(a => a.id === id);
+    const type = api?.type === 'divider' ? 'divider' : 'subscription';
+    setDeleteConfirm({ show: true, id, type });
   };
 
   const confirmDelete = () => {
@@ -220,7 +222,7 @@ function App() {
         setApis(updatedApis);
       }
       
-      setDeleteConfirm({ show: false, id: null });
+      setDeleteConfirm({ show: false, id: null, type: undefined });
     }
   };
 
@@ -516,13 +518,13 @@ function App() {
         
         {deleteConfirm.show && (
           <ConfirmModal
-            title="Delete API"
-            message="Are you sure you want to delete this API? This action cannot be undone."
+            title={`Delete ${deleteConfirm.type === 'divider' ? 'Divider' : 'Sub'}`}
+            message={`Are you sure you want to delete this ${deleteConfirm.type === 'divider' ? 'divider' : 'subscription'}? This action cannot be undone.`}
             confirmText="Delete"
             cancelText="Cancel"
             type="danger"
             onConfirm={confirmDelete}
-            onCancel={() => setDeleteConfirm({ show: false, id: null })}
+            onCancel={() => setDeleteConfirm({ show: false, id: null, type: undefined })}
           />
         )}
         
