@@ -32,7 +32,37 @@ function App() {
   const { showNotification } = useNotification();
   const [apis, setApis] = useState<API[]>(() => {
     // Initialize state directly from storage
-    return storage.getAPIs();
+    const storedApis = storage.getAPIs();
+    
+    // Check if there are subscriptions but no default divider
+    const hasSubscriptions = storedApis.some(api => api.type !== 'divider');
+    const hasDefaultDivider = storedApis.some(api => api.id === 'divider-section-1');
+    
+    if (hasSubscriptions && !hasDefaultDivider) {
+      // Add default divider at the beginning
+      const defaultDivider: API = {
+        id: 'divider-section-1',
+        type: 'divider',
+        serviceName: 'Section 1',
+        apiKey: '',
+        email: '',
+        subscriptionType: 'free',
+        category: 'other',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      const updatedApis = [defaultDivider, ...storedApis];
+      storage.saveAPIs(updatedApis);
+      
+      // Update the order to maintain the divider at the top
+      const apiOrder = updatedApis.map(api => api.id);
+      localStorage.setItem('apiOrder', JSON.stringify(apiOrder));
+      
+      return updatedApis;
+    }
+    
+    return storedApis;
   });
   const [categories, setCategories] = useState<Category[]>(() => {
     // Initialize categories directly from storage
@@ -144,7 +174,29 @@ function App() {
     if (editingAPI) {
       setApis(apis.map(a => a.id === api.id ? api : a));
     } else {
-      setApis([...apis, api]);
+      // Check if this is the first subscription (non-divider) being added
+      const existingSubscriptions = apis.filter(a => a.type !== 'divider');
+      if (existingSubscriptions.length === 0) {
+        // Create a default divider for Section 1
+        const defaultDivider: API = {
+          id: `divider-section-1`,
+          type: 'divider',
+          serviceName: 'Section 1',
+          apiKey: '',
+          email: '',
+          subscriptionType: 'free',
+          category: 'other',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        setApis([defaultDivider, api]);
+        
+        // Update the order to maintain the divider at the top
+        const apiOrder = [defaultDivider.id, api.id];
+        localStorage.setItem('apiOrder', JSON.stringify(apiOrder));
+      } else {
+        setApis([...apis, api]);
+      }
     }
     setShowAPIModal(false);
   };
@@ -155,7 +207,19 @@ function App() {
 
   const confirmDelete = () => {
     if (deleteConfirm.id) {
-      setApis(apis.filter(a => a.id !== deleteConfirm.id));
+      const updatedApis = apis.filter(a => a.id !== deleteConfirm.id);
+      
+      // Check if we're deleting the last subscription and only the default divider remains
+      const remainingSubscriptions = updatedApis.filter(a => a.type !== 'divider');
+      const defaultDivider = updatedApis.find(a => a.id === 'divider-section-1');
+      
+      if (remainingSubscriptions.length === 0 && defaultDivider && updatedApis.length === 1) {
+        // Remove the default divider too if no subscriptions remain
+        setApis([]);
+      } else {
+        setApis(updatedApis);
+      }
+      
       setDeleteConfirm({ show: false, id: null });
     }
   };
@@ -252,7 +316,19 @@ function App() {
   };
 
   const confirmBulkDelete = () => {
-    setApis(apis.filter(api => !selectedIds.has(api.id)));
+    const updatedApis = apis.filter(api => !selectedIds.has(api.id));
+    
+    // Check if we're deleting all subscriptions and only the default divider remains
+    const remainingSubscriptions = updatedApis.filter(a => a.type !== 'divider');
+    const defaultDivider = updatedApis.find(a => a.id === 'divider-section-1');
+    
+    if (remainingSubscriptions.length === 0 && defaultDivider && updatedApis.length === 1) {
+      // Remove the default divider too if no subscriptions remain
+      setApis([]);
+    } else {
+      setApis(updatedApis);
+    }
+    
     setSelectedIds(new Set());
     setBulkDeleteConfirm(false);
   };
