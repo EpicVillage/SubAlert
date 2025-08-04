@@ -281,12 +281,12 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
             
             filteredAPIs.forEach((api, index) => {
               if (api.type === 'divider') {
-                // Add placeholders to fill the previous section
-                if (isEditMode) {
+                // Add placeholders to fill the previous section (but not before the first divider)
+                if (isEditMode && index > 0) {
                   const sectionItems = itemsWithPlaceholders.slice(currentSectionStart);
                   const nonDividerCount = sectionItems.filter(item => item.type !== 'divider' && item.type !== 'placeholder').length;
                   const gridColumns = isCompactMode ? 5 : 3; // Approximate columns based on mode
-                  const placeholdersNeeded = nonDividerCount > 0 ? (gridColumns - (nonDividerCount % gridColumns)) % gridColumns : gridColumns;
+                  const placeholdersNeeded = nonDividerCount > 0 ? (gridColumns - (nonDividerCount % gridColumns)) % gridColumns : 0;
                   
                   for (let i = 0; i < placeholdersNeeded; i++) {
                     itemsWithPlaceholders.push({
@@ -321,12 +321,12 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
               }
             });
             
-            // Add placeholders for the last section
-            if (isEditMode) {
+            // Add placeholders for the last section (only if there's a section after the last divider)
+            if (isEditMode && currentSectionStart < itemsWithPlaceholders.length) {
               const sectionItems = itemsWithPlaceholders.slice(currentSectionStart);
               const nonDividerCount = sectionItems.filter(item => item.type !== 'divider' && item.type !== 'placeholder').length;
               const gridColumns = isCompactMode ? 5 : 3;
-              const placeholdersNeeded = nonDividerCount > 0 ? (gridColumns - (nonDividerCount % gridColumns)) % gridColumns : gridColumns;
+              const placeholdersNeeded = nonDividerCount > 0 ? (gridColumns - (nonDividerCount % gridColumns)) % gridColumns : 0;
               
               for (let i = 0; i < placeholdersNeeded; i++) {
                 itemsWithPlaceholders.push({
