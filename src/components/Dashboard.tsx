@@ -342,10 +342,10 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
                 return (
                   <div
                     key={item.id}
-                    className="placeholder-card"
+                    className={`placeholder-card ${dragOverIndex === item.index + 0.5 ? 'drag-over' : ''}`}
                     onDragOver={(e) => {
                       e.preventDefault();
-                      setDragOverIndex(item.index);
+                      setDragOverIndex(item.index + 0.5);
                     }}
                     onDragLeave={() => setDragOverIndex(null)}
                     onDrop={(e) => {
