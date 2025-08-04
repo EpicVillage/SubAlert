@@ -12,7 +12,36 @@ const STORAGE_KEYS = {
 export const storage = {
   getAPIs: (): API[] => {
     const data = localStorage.getItem(STORAGE_KEYS.APIS);
-    return data ? JSON.parse(data) : [];
+    const apis: API[] = data ? JSON.parse(data) : [];
+    
+    // Apply custom order if exists
+    const orderData = localStorage.getItem('apiOrder');
+    if (orderData) {
+      try {
+        const order: string[] = JSON.parse(orderData);
+        const orderedApis: API[] = [];
+        const apiMap = new Map<string, API>(apis.map((api: API) => [api.id, api]));
+        
+        // Add APIs in the saved order
+        order.forEach((id: string) => {
+          const api = apiMap.get(id);
+          if (api) {
+            orderedApis.push(api);
+            apiMap.delete(id);
+          }
+        });
+        
+        // Add any remaining APIs not in the order
+        apiMap.forEach((api: API) => orderedApis.push(api));
+        
+        return orderedApis;
+      } catch (e) {
+        // If order data is invalid, return APIs as is
+        return apis;
+      }
+    }
+    
+    return apis;
   },
 
   saveAPIs: (apis: API[]) => {

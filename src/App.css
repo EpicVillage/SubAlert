@@ -406,6 +406,12 @@ body {
   background: linear-gradient(to bottom, rgba(220, 38, 38, 0.05), var(--bg-primary));
 }
 
+.api-card.expiring-today {
+  border: 2px solid var(--danger);
+  box-shadow: 0 0 0 1px var(--danger), var(--shadow-md);
+  background: linear-gradient(to bottom, rgba(220, 38, 38, 0.08), var(--bg-primary));
+}
+
 .api-card.selected {
   border-color: var(--primary);
   background: linear-gradient(to bottom, rgba(37, 99, 235, 0.05), var(--bg-primary));
@@ -3341,4 +3347,57 @@ form {
   .custom-field-item {
     margin-left: 0;
   }
+}
+
+/* Drag and Drop Styles */
+.draggable-card-wrapper {
+  transition: transform 0.2s ease;
+  cursor: grab;
+}
+
+.draggable-card-wrapper[draggable="false"] {
+  cursor: default;
+}
+
+.draggable-card-wrapper[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.draggable-card-wrapper.drag-over {
+  transform: scale(1.02);
+  position: relative;
+}
+
+.draggable-card-wrapper.drag-over::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 3px dashed var(--primary);
+  border-radius: var(--radius);
+  opacity: 0.7;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.draggable-card-wrapper[draggable="true"] {
+  position: relative;
+}
+
+.draggable-card-wrapper[draggable="true"]:hover::after {
+  content: '⋮⋮';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Dragging state */
+.draggable-card-wrapper:active {
+  opacity: 0.5;
 }

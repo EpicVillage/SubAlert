@@ -149,6 +149,14 @@ function App() {
     setApis(apis.map(a => a.id === api.id ? api : a));
   };
 
+  const handleReorderAPIs = (reorderedAPIs: API[]) => {
+    setApis(reorderedAPIs);
+    storage.saveAPIs(reorderedAPIs);
+    // Save the order
+    const apiOrder = reorderedAPIs.map(api => api.id);
+    localStorage.setItem('apiOrder', JSON.stringify(apiOrder));
+  };
+
   const handleSaveCategories = (newCategories: Category[]) => {
     setCategories(newCategories);
     setShowCategoryManager(false);
@@ -322,6 +330,7 @@ function App() {
                   onEditAPI={handleEditAPI}
                   onDeleteAPI={handleDeleteAPI}
                   onUpdateAPI={handleUpdateAPI}
+                  onReorderAPIs={handleReorderAPIs}
                   isEditMode={isEditMode}
                   isMobile={true}
                   selectedIds={selectedIds}
@@ -335,6 +344,7 @@ function App() {
                     onEditAPI={handleEditAPI}
                     onDeleteAPI={handleDeleteAPI}
                     onUpdateAPI={handleUpdateAPI}
+                    onReorderAPIs={handleReorderAPIs}
                     isEditMode={isEditMode}
                     isMobile={true}
                     selectedIds={selectedIds}
@@ -349,6 +359,7 @@ function App() {
                 onEditAPI={handleEditAPI}
                 onDeleteAPI={handleDeleteAPI}
                 onUpdateAPI={handleUpdateAPI}
+                onReorderAPIs={handleReorderAPIs}
                 isEditMode={isEditMode}
                 isMobile={false}
                 selectedIds={selectedIds}

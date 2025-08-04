@@ -45,6 +45,7 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
   const isRenewal = shouldShowAsRenewal(api);
   const isExpiringSoon = daysLeft !== null && daysLeft > 0 && daysLeft <= 7;
   const isExpired = daysLeft !== null && daysLeft < 0 && !isRenewal;
+  const isExpiringToday = daysLeft === 0;
 
   const category = getCategoryById(categories, api.category) || {
     id: 'other',
@@ -56,7 +57,7 @@ const CompactAPICard: React.FC<CompactAPICardProps> = ({
 
   return (
     <>
-    <div className={`api-card compact ${isEditMode ? 'edit-mode' : ''} ${isEditMode && isSelected ? 'selected' : ''} ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}>
+    <div className={`api-card compact ${isEditMode ? 'edit-mode' : ''} ${isEditMode && isSelected ? 'selected' : ''} ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''} ${isExpiringToday ? 'expiring-today' : ''}`}>
       <div className="compact-content">
         <div className="compact-header">
         <div className="compact-title-row">

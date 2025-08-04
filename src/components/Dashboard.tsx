@@ -15,13 +15,14 @@ interface DashboardProps {
   onEditAPI: (api: API) => void;
   onDeleteAPI: (id: string) => void;
   onUpdateAPI?: (api: API) => void;
+  onReorderAPIs?: (apis: API[]) => void;
   isEditMode?: boolean;
   isMobile?: boolean;
   selectedIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, isEditMode = false, isMobile = false, selectedIds = new Set(), onToggleSelect }) => {
+const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDeleteAPI, onUpdateAPI, onReorderAPIs, isEditMode = false, isMobile = false, selectedIds = new Set(), onToggleSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'expiring' | 'paid' | 'free'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'category' | 'list'>(() => {
@@ -35,6 +36,8 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
     const saved = localStorage.getItem('compactMode');
     return saved === 'true';
   });
+  const [draggedItem, setDraggedItem] = useState<API | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     localStorage.setItem('viewMode', viewMode);
@@ -88,6 +91,62 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
       }
       return total + api.cost!;
     }, 0);
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, api: API, index: number) => {
+    setDraggedItem(api);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    
+    if (dragIndex !== dropIndex && draggedItem) {
+      const newFilteredAPIs = [...filteredAPIs];
+      newFilteredAPIs.splice(dragIndex, 1);
+      newFilteredAPIs.splice(dropIndex, 0, draggedItem);
+      setFilteredAPIs(newFilteredAPIs);
+      
+      // If we're viewing all items (no filter), update the global order
+      if (filterType === 'all' && searchTerm === '' && onReorderAPIs) {
+        // Create a new ordered array based on all APIs
+        const allAPIsMap = new Map(apis.map(api => [api.id, api]));
+        const orderedAPIs: API[] = [];
+        
+        // First add the APIs in the new order
+        newFilteredAPIs.forEach(api => {
+          orderedAPIs.push(api);
+          allAPIsMap.delete(api.id);
+        });
+        
+        // Then add any remaining APIs that weren't in the filtered list
+        allAPIsMap.forEach(api => orderedAPIs.push(api));
+        
+        // Call the reorder handler
+        onReorderAPIs(orderedAPIs);
+      }
+    }
+    
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  };
 
   return (
     <div className="dashboard">
@@ -209,41 +268,49 @@ const Dashboard: React.FC<DashboardProps> = ({ apis, categories, onEditAPI, onDe
 
       {viewMode === 'grid' ? (
         <div className={`api-grid ${isCompactMode ? 'compact-grid' : ''}`}>
-          {filteredAPIs.map(api => (
-            isMobile && !isCompactMode ? (
-              <MobileAPICard
-                key={api.id}
-                api={api}
-                categories={categories}
-                onEdit={() => onEditAPI(api)}
-                onDelete={() => onDeleteAPI(api.id)}
-                isEditMode={isEditMode}
-                isSelected={selectedIds.has(api.id)}
-                onToggleSelect={() => onToggleSelect?.(api.id)}
-              />
-            ) : isCompactMode ? (
-              <CompactAPICard
-                key={api.id}
-                api={api}
-                categories={categories}
-                onEdit={() => onEditAPI(api)}
-                onDelete={() => onDeleteAPI(api.id)}
-                isEditMode={isEditMode}
-                isSelected={selectedIds.has(api.id)}
-                onToggleSelect={() => onToggleSelect?.(api.id)}
-              />
-            ) : (
-              <APICard
-                key={api.id}
-                api={api}
-                categories={categories}
-                onEdit={() => onEditAPI(api)}
-                onDelete={() => onDeleteAPI(api.id)}
-                isEditMode={isEditMode}
-                isSelected={selectedIds.has(api.id)}
-                onToggleSelect={() => onToggleSelect?.(api.id)}
-              />
-            )
+          {filteredAPIs.map((api, index) => (
+            <div
+              key={api.id}
+              draggable={isEditMode}
+              onDragStart={isEditMode ? (e) => handleDragStart(e, api, index) : undefined}
+              onDragEnd={isEditMode ? handleDragEnd : undefined}
+              onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
+              onDragLeave={isEditMode ? handleDragLeave : undefined}
+              onDrop={isEditMode ? (e) => handleDrop(e, index) : undefined}
+              className={`draggable-card-wrapper ${dragOverIndex === index ? 'drag-over' : ''}`}
+            >
+              {isMobile && !isCompactMode ? (
+                <MobileAPICard
+                  api={api}
+                  categories={categories}
+                  onEdit={() => onEditAPI(api)}
+                  onDelete={() => onDeleteAPI(api.id)}
+                  isEditMode={isEditMode}
+                  isSelected={selectedIds.has(api.id)}
+                  onToggleSelect={() => onToggleSelect?.(api.id)}
+                />
+              ) : isCompactMode ? (
+                <CompactAPICard
+                  api={api}
+                  categories={categories}
+                  onEdit={() => onEditAPI(api)}
+                  onDelete={() => onDeleteAPI(api.id)}
+                  isEditMode={isEditMode}
+                  isSelected={selectedIds.has(api.id)}
+                  onToggleSelect={() => onToggleSelect?.(api.id)}
+                />
+              ) : (
+                <APICard
+                  api={api}
+                  categories={categories}
+                  onEdit={() => onEditAPI(api)}
+                  onDelete={() => onDeleteAPI(api.id)}
+                  isEditMode={isEditMode}
+                  isSelected={selectedIds.has(api.id)}
+                  onToggleSelect={() => onToggleSelect?.(api.id)}
+                />
+              )}
+            </div>
           ))}
           {filteredAPIs.length === 0 && (
             <div className="empty-state">

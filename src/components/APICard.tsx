@@ -45,6 +45,7 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
   const isRenewal = shouldShowAsRenewal(api);
   const isExpiringSoon = daysLeft !== null && daysLeft > 0 && daysLeft <= 7;
   const isExpired = daysLeft !== null && daysLeft < 0 && !isRenewal;
+  const isExpiringToday = daysLeft === 0;
 
   const category = getCategoryById(categories, api.category) || {
     id: 'other',
@@ -56,7 +57,7 @@ const APICard: React.FC<APICardProps> = ({ api, categories, onEdit, onDelete, is
 
   return (
     <>
-    <div className={`api-card ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''} ${isSelected ? 'selected' : ''}`}>
+    <div className={`api-card ${isExpiringSoon ? 'expiring' : ''} ${isExpired ? 'expired' : ''} ${isExpiringToday ? 'expiring-today' : ''} ${isSelected ? 'selected' : ''}`}>
       <div className="api-card-header">
         <div className="api-card-header-left">
           {isEditMode && (
