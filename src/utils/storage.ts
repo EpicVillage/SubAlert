@@ -103,6 +103,7 @@ export const storage = {
       settings: storage.getSettings(),
       categories: storage.getCategories(),
       aiSettings: aiSettings,
+      apiOrder: localStorage.getItem('apiOrder') ? JSON.parse(localStorage.getItem('apiOrder')!) : null,
       exportDate: new Date().toISOString()
     };
     
@@ -213,6 +214,11 @@ export const storage = {
       // Import AI settings if present (always replace)
       if (data.aiSettings) {
         localStorage.setItem('subalert_ai_settings', JSON.stringify(data.aiSettings));
+      }
+      
+      // Import API order if present (always replace)
+      if (data.apiOrder && Array.isArray(data.apiOrder)) {
+        localStorage.setItem('apiOrder', JSON.stringify(data.apiOrder));
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
